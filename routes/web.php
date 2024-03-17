@@ -1,0 +1,61 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\language\LanguageController;
+use App\Http\Controllers\pages\HomePage;
+use App\Http\Controllers\pages\Page2;
+use App\Http\Controllers\pages\MiscError;
+use App\Http\Controllers\authentications\LoginBasic;
+use App\Http\Controllers\authentications\RegisterBasic;
+use App\Http\Controllers\customer\CustomerController;
+use App\Http\Controllers\invoice\InvoiceController;
+use App\Http\Controllers\logistics\LogisticsrController;
+use App\Http\Controllers\user\UsersController;
+use Illuminate\Support\Facades\Artisan;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
+|
+*/
+
+Route::get('/clear', function () {
+    $exitCode = Artisan::call('cache:clear');
+    $exitCode = Artisan::call('optimize');
+    return '<h1>Cache facade value cleared</h1>';
+});
+
+
+// Main Page Route
+Route::get('/', [HomePage::class, 'index'])->name('pages-home');
+Route::get('/page-2', [Page2::class, 'index'])->name('pages-page-2');
+
+// locale
+Route::get('lang/{locale}', [LanguageController::class, 'swap']);
+
+// pages
+Route::get('/pages/misc-error', [MiscError::class, 'index'])->name('pages-misc-error');
+
+// authentication
+Route::get('/auth/login-basic', [LoginBasic::class, 'index'])->name('auth-login-basic');
+Route::get('/auth/register-basic', [RegisterBasic::class, 'index'])->name('auth-register-basic');
+
+
+Route::get('/app/invoice/purchase', [InvoiceController::class, 'purchase'])->name('app-invoice-purchase');
+Route::get('/app/invoice/sale', [InvoiceController::class, 'sale'])->name('app-invoice-sale');
+
+
+Route::get('/app/user/list', [UsersController::class, 'index'])->name('app-user-list');
+
+
+Route::get('/app/ecommerce/customer/all', [CustomerController::class, 'index'])->name('app-ecommerce-customer-all');
+Route::get('/app/ecommerce/customer/create', [CustomerController::class, 'create'])->name('app-ecommerce-customer-create');
+Route::post('/app/ecommerce/customer/create/store', [CustomerController::class, 'store'])->name('app-ecommerce-customer-create-store');
+
+
+Route::get('/app/logistics/dashboard', [LogisticsrController::class, 'index'])->name('app-logistics-dashboard');
