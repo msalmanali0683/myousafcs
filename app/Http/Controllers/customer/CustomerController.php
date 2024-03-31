@@ -76,15 +76,39 @@ class CustomerController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $customer = Customer::findOrFail($id);
+        return view('customer.edit', compact('customer'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        // Validate the incoming request data
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'contact_number' => 'required|string|max:15',
+            'address' => 'required|string|max:255',
+        ]);
+
+        try {
+
+            $customer = Customer::find($id);
+            // Assign values from the request
+            $customer->name = $validatedData['name'];
+            $customer->contact = $validatedData['contact_number'];
+            $customer->address = $validatedData['address'];
+
+            // Save the customer record
+            $customer->save();
+
+            // Return a success response
+            return response()->json(['message' => 'Customer Updated successfully'], 201);
+        } catch (\Exception $e) {
+            // Return an error response if something goes wrong
+            return response()->json(['message' => 'Failed to add customer', 'error' => $e->getMessage()], 500);
+        }
     }
 
     /**

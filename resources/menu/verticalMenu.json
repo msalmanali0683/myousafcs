@@ -51,6 +51,23 @@
       ]
     },
     {
+      "name": "Product",
+      "icon": "menu-icon tf-icons ti ti-layout-grid",
+      "slug": "app-product",
+      "submenu": [
+        {
+          "url": "app/product/list",
+          "name": "All Products",
+          "slug": "app-product-list"
+        },
+        {
+          "url": "app/academy/course-details",
+          "name": "Add New Product",
+          "slug": "app-academy-course-details"
+        }
+      ]
+    },
+    {
       "name": "Customers",
       "icon": "menu-icon tf-icons ti ti-users",
       "slug": "app-ecommerce-customer",

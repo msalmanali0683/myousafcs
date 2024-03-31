@@ -93,7 +93,7 @@
                                     <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
                                         data-bs-toggle="dropdown"><i class="ti ti-dots-vertical"></i></button>
                                     <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="javascript:void(0);"><i
+                                        <a class="dropdown-item" href="{{ route('customer.edit', $customer->id) }}"><i
                                                 class="ti ti-pencil me-1"></i>Edit</a>
                                         <a class="dropdown-item" href="javascript:void(0);"><i
                                                 class="ti ti-trash me-1"></i>Delete</a>

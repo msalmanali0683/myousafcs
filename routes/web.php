@@ -9,7 +9,9 @@ use App\Http\Controllers\authentications\LoginBasic;
 use App\Http\Controllers\authentications\RegisterBasic;
 use App\Http\Controllers\customer\CustomerController;
 use App\Http\Controllers\invoice\InvoiceController;
+use App\Http\Controllers\logistics\LogisticsController;
 use App\Http\Controllers\logistics\LogisticsrController;
+use App\Http\Controllers\product\ProductController;
 use App\Http\Controllers\user\UsersController;
 use Illuminate\Support\Facades\Artisan;
 
@@ -53,9 +55,18 @@ Route::get('/app/invoice/sale', [InvoiceController::class, 'sale'])->name('app-i
 Route::get('/app/user/list', [UsersController::class, 'index'])->name('app-user-list');
 
 
+Route::get('/app/product/list', [ProductController::class, 'index'])->name('app-product-list');
+Route::post('/app/product/store', [ProductController::class, 'store'])->name('app-product-store');
+
+
 Route::get('/app/ecommerce/customer/all', [CustomerController::class, 'index'])->name('app-ecommerce-customer-all');
 Route::get('/app/ecommerce/customer/create', [CustomerController::class, 'create'])->name('app-ecommerce-customer-create');
 Route::post('/app/ecommerce/customer/create/store', [CustomerController::class, 'store'])->name('app-ecommerce-customer-create-store');
+Route::get('/app/ecommerce/customer/edit/{id}', [CustomerController::class, 'edit'])->name('customer.edit');
+Route::post('/app/ecommerce/customer/update/{id}', [CustomerController::class, 'update'])->name('app-ecommerce-customer-update');
 
 
-Route::get('/app/logistics/dashboard', [LogisticsrController::class, 'index'])->name('app-logistics-dashboard');
+
+Route::get('/app/logistics/dashboard', [LogisticsController::class, 'dashboard'])->name('app-logistics-dashboard');
+Route::get('/app/logistics/create', [LogisticsController::class, 'index'])->name('app-logistics-list');
+Route::post('/app/logistics/store', [LogisticsController::class, 'store'])->name('app-logistics-store');
