@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Logistic extends Model
+class Labour extends Model
 {
     use HasFactory;
     protected $guarded  = [];
 
-    public function invoice_logistic(): HasMany
+    public function invoice_labour(): HasMany
     {
-        return $this->hasMany(InvoiceLogistics::class);
+        return $this->hasMany(InvoiceLabour::class);
     }
 }

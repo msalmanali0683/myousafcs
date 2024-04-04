@@ -1,25 +1,21 @@
 <?php
 
-namespace App\Http\Controllers\logistics;
+namespace App\Http\Controllers\labour;
 
 use App\Http\Controllers\Controller;
-use App\Models\Logistic;
+use App\Models\Labour;
 use Illuminate\Http\Request;
 
-class LogisticsController extends Controller
+class LabourController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $logistics = Logistic::all();
-        return view('logistics.logistics', ['logistics' => $logistics]);
-    }
 
-    public function dashboard()
-    {
-        return view('logistics.index');
+        $labours = Labour::all();
+        return view('labour.index', ['labours' => $labours]);
     }
 
     /**
@@ -37,32 +33,29 @@ class LogisticsController extends Controller
     {
         // Validate the incoming request data
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'details' => 'string|max:255',
+            'name' => 'required|string|max:255|unique:products',
         ]);
 
         try {
-            // Create a new Customer instance
             if ($request->id) {
-                $logistic =  Logistic::find($request->id);
+                // Update Customer instance
+                $labour =  Labour::find($request->id);
 
                 // Assign values from the request
-                $logistic->name = $validatedData['name'];
-                $logistic->details = $validatedData['details'];
+                $labour->name = $validatedData['name'];
 
-                // Save the logistic record
-                $logistic->save();
+                // Save the labour record
+                $labour->save();
             } else {
-                $logistic = new Logistic();
+                // Create a new Customer instance
+                $labour = new Labour();
 
                 // Assign values from the request
-                $logistic->name = $validatedData['name'];
-                $logistic->details = $validatedData['details'];
+                $labour->name = $validatedData['name'];
 
-                // Save the logistic record
-                $logistic->save();
+                // Save the labour record
+                $labour->save();
             }
-
 
             // Return a success response
             return response()->json(['message' => 'Customer added successfully'], 201);

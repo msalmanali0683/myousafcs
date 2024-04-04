@@ -7,8 +7,10 @@ use App\Http\Controllers\pages\Page2;
 use App\Http\Controllers\pages\MiscError;
 use App\Http\Controllers\authentications\LoginBasic;
 use App\Http\Controllers\authentications\RegisterBasic;
+use App\Http\Controllers\Banks\BankController;
 use App\Http\Controllers\customer\CustomerController;
 use App\Http\Controllers\invoice\InvoiceController;
+use App\Http\Controllers\labour\LabourController;
 use App\Http\Controllers\logistics\LogisticsController;
 use App\Http\Controllers\logistics\LogisticsrController;
 use App\Http\Controllers\product\ProductController;
@@ -50,6 +52,7 @@ Route::get('/auth/register-basic', [RegisterBasic::class, 'index'])->name('auth-
 
 Route::get('/app/invoice/purchase', [InvoiceController::class, 'purchase'])->name('app-invoice-purchase');
 Route::get('/app/invoice/sale', [InvoiceController::class, 'sale'])->name('app-invoice-sale');
+Route::post('/app/ecommerce/invoice/store', [InvoiceController::class, 'store'])->name('app-invoice-store');
 
 
 Route::get('/app/user/list', [UsersController::class, 'index'])->name('app-user-list');
@@ -68,5 +71,11 @@ Route::post('/app/ecommerce/customer/update/{id}', [CustomerController::class, '
 
 
 Route::get('/app/logistics/dashboard', [LogisticsController::class, 'dashboard'])->name('app-logistics-dashboard');
-Route::get('/app/logistics/create', [LogisticsController::class, 'index'])->name('app-logistics-list');
+Route::get('/app/logistics/create', [LogisticsController::class, 'index'])->name('app-logistics-create');
 Route::post('/app/logistics/store', [LogisticsController::class, 'store'])->name('app-logistics-store');
+
+Route::get('/app/banks/all', [BankController::class, 'index'])->name('app-banks-all');
+Route::post('/app/banks/store', [BankController::class, 'store'])->name('app-banks-store');
+
+Route::get('/app/employee/labour', [LabourController::class, 'index'])->name('app-employee-labour');
+Route::post('/app/labour/store', [LabourController::class, 'store'])->name('app-labour-store');

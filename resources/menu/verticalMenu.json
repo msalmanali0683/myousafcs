@@ -96,7 +96,7 @@
         },
         {
           "url": "app/logistics/create",
-          "name": "New Vehicle",
+          "name": "All Vehicle",
           "slug": "app-logistics-create"
         }
       ]
@@ -104,12 +104,12 @@
     {
       "name": "Employes",
       "icon": "menu-icon tf-icons ti ti-user",
-      "slug": "app-user",
+      "slug": "app-employee",
       "submenu": [
         {
-          "url": "app/ecommerce/customer/all",
-          "name": "Employee Category",
-          "slug": "app-ecommerce-customer-all"
+          "url": "app/employee/labour",
+          "name": "Labour",
+          "slug": "app-employee-labour"
         },
         {
           "url": "app/ecommerce/customer/all",
@@ -129,9 +129,9 @@
       "slug": "app-user",
       "submenu": [
         {
-          "url": "app/ecommerce/customer/all",
+          "url": "app/banks/all",
           "name": "Banks List",
-          "slug": "app-ecommerce-customer-all"
+          "slug": "app-banks-all"
         },
         {
           "url": "app/ecommerce/customer/all",

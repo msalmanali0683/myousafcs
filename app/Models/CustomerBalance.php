@@ -4,15 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Logistic extends Model
+class CustomerBalance extends Model
 {
     use HasFactory;
+
     protected $guarded  = [];
 
-    public function invoice_logistic(): HasMany
+    public function customer(): BelongsTo
     {
-        return $this->hasMany(InvoiceLogistics::class);
+        return $this->belongsTo(Customer::class);
     }
 }

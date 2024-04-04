@@ -20,7 +20,7 @@
 
 @section('content')
     <h4 class="py-3 mb-4">
-        <span class="text-muted fw-light"></span> Product Details
+        <span class="text-muted fw-light"></span> Bank Details
     </h4>
     <div class="row">
         <div class="col-12 col-lg-9">
@@ -39,8 +39,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Name</th>
-                                <th>Stock (MN)</th>
-                                <th>Stock (KG)</th>
+                                <th>Account Number</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -48,13 +47,12 @@
                             @php
                                 $i = 1;
                             @endphp
-                            @foreach ($products as $product)
+                            @foreach ($banks as $bank)
                                 <tr>
                                     <td>{{ $i++ }}</td>
-                                    <td class="product-id" hidden>{{ $product->id }}</td>
-                                    <td class="product-name">{{ $product->name }}</td>
-                                    <td>0</td>
-                                    <td>0</td>
+                                    <td class="bank-id" hidden>{{ $bank->id }}</td>
+                                    <td class="bank-name">{{ $bank->name }}</td>
+                                    <td class="bank-account">{{ $bank->account }}</td>
                                     <td>
                                         <div class="dropdown">
                                             <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
@@ -80,7 +78,7 @@
         <div class="col-12 col-lg-3">
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Add new Product</h5>
+                    <h5 class="card-title mb-0">Add new Bank</h5>
                 </div>
                 <div class="card-body">
                     <form id="newCustomerform" class="form-repeater">
@@ -88,9 +86,14 @@
                             <div data-repeater-item="">
                                 <div class="row">
                                     <div class="mb-3 col-12">
-                                        <label class="form-label" for="name">Product Name</label>
+                                        <label class="form-label" for="name">Bank Name</label>
                                         <input type="text" id="name" class="form-control"
-                                            placeholder="Enter product name ....">
+                                            placeholder="Enter bank name ...." required>
+                                    </div>
+                                    <div class="mb-3 col-12">
+                                        <label class="form-label" for="account">Account number</label>
+                                        <input type="text" id="account" class="form-control"
+                                            placeholder="Enter account number ...." required>
                                     </div>
                                     <div class="col-8 offset-4">
                                         <button class="btn btn-primary waves-effect waves-light" data-repeater-create="">
@@ -112,15 +115,16 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         $(document).ready(function() {
-            var editProductID = null;
+            var editbankID = null;
             $('.dropdown-menu').on('click', '.edit', function() {
                 // Retrieve the product name from the table row
-                var productName = $(this).closest('tr').find('.product-name').text().trim();
-                editProductID = $(this).closest('tr').find('.product-id').text().trim();
-                console.log('working');
-                console.log(productName);
-                // Set the retrieved product name as the value of the input field
-                $('#name').val(productName);
+                var bankName = $(this).closest('tr').find('.bank-name').text().trim();
+                var bankaccount = $(this).closest('tr').find('.bank-account').text().trim();
+                editbankID = $(this).closest('tr').find('.bank-id').text().trim();
+                console.log(editbankID);
+                // Set the retrieved bank name as the value of the input field
+                $('#name').val(bankName);
+                $('#account').val(bankaccount);
             });
 
             $('#newCustomerform').submit(function(event) {
@@ -131,14 +135,15 @@
                 var formData = {
                     '_token': $('meta[name="csrf-token"]').attr('content'),
                     'name': $('#name').val(),
-                    'id': editProductID
+                    'account': $('#account').val(),
+                    'id': editbankID
                 };
 
                 console.log(formData);
                 // Send AJAX request to the server
                 $.ajax({
                     type: 'POST',
-                    url: '/app/product/store',
+                    url: '/app/banks/store',
                     data: formData,
                     dataType: 'json',
                     success: function(data) {
@@ -146,6 +151,7 @@
                         console.log('Data inserted successfully:', data);
                         // Optionally, reset the form after successful submission
                         $('#newCustomerform')[0].reset();
+                        window.location.href = "{{ route('app-banks-all') }}";
                     },
                     error: function(xhr, status, error) {
                         // Handle error response

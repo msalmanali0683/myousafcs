@@ -56,15 +56,6 @@ class ProductController extends Controller
                 $product->save();
             }
 
-            // Create a new Customer instance
-            $product = new Product();
-
-            // Assign values from the request
-            $product->name = $validatedData['name'];
-
-            // Save the product record
-            $product->save();
-
             // Return a success response
             return response()->json(['message' => 'Customer added successfully'], 201);
         } catch (\Exception $e) {

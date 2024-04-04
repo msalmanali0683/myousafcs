@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'eCommerce Product List - Apps')
+@section('title', 'Labour')
 
 @section('vendor-style')
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
@@ -20,7 +20,7 @@
 
 @section('content')
     <h4 class="py-3 mb-4">
-        <span class="text-muted fw-light"></span> Product Details
+        <span class="text-muted fw-light"></span> Labour Details
     </h4>
     <div class="row">
         <div class="col-12 col-lg-9">
@@ -39,8 +39,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Name</th>
-                                <th>Stock (MN)</th>
-                                <th>Stock (KG)</th>
+                                <th>Balance</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -48,13 +47,12 @@
                             @php
                                 $i = 1;
                             @endphp
-                            @foreach ($products as $product)
+                            @foreach ($labours as $labour)
                                 <tr>
                                     <td>{{ $i++ }}</td>
-                                    <td class="product-id" hidden>{{ $product->id }}</td>
-                                    <td class="product-name">{{ $product->name }}</td>
-                                    <td>0</td>
-                                    <td>0</td>
+                                    <td class="labour-id" hidden>{{ $labour->id }}</td>
+                                    <td class="labour-name">{{ $labour->name }}</td>
+                                    <td>{{ $labour->balance }}</td>
                                     <td>
                                         <div class="dropdown">
                                             <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
@@ -80,7 +78,7 @@
         <div class="col-12 col-lg-3">
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Add new Product</h5>
+                    <h5 class="card-title mb-0">Add new Labour</h5>
                 </div>
                 <div class="card-body">
                     <form id="newCustomerform" class="form-repeater">
@@ -88,9 +86,9 @@
                             <div data-repeater-item="">
                                 <div class="row">
                                     <div class="mb-3 col-12">
-                                        <label class="form-label" for="name">Product Name</label>
+                                        <label class="form-label" for="name">Labour Name</label>
                                         <input type="text" id="name" class="form-control"
-                                            placeholder="Enter product name ....">
+                                            placeholder="Enter Labour name ....">
                                     </div>
                                     <div class="col-8 offset-4">
                                         <button class="btn btn-primary waves-effect waves-light" data-repeater-create="">
@@ -112,15 +110,15 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         $(document).ready(function() {
-            var editProductID = null;
+            var editlabourID = null;
             $('.dropdown-menu').on('click', '.edit', function() {
                 // Retrieve the product name from the table row
-                var productName = $(this).closest('tr').find('.product-name').text().trim();
-                editProductID = $(this).closest('tr').find('.product-id').text().trim();
+                var labourName = $(this).closest('tr').find('.labour-name').text().trim();
+                editlabourID = $(this).closest('tr').find('.labour-id').text().trim();
                 console.log('working');
-                console.log(productName);
-                // Set the retrieved product name as the value of the input field
-                $('#name').val(productName);
+                console.log(editlabourID);
+                // Set the retrieved labour name as the value of the input field
+                $('#name').val(labourName);
             });
 
             $('#newCustomerform').submit(function(event) {
@@ -131,14 +129,14 @@
                 var formData = {
                     '_token': $('meta[name="csrf-token"]').attr('content'),
                     'name': $('#name').val(),
-                    'id': editProductID
+                    'id': editlabourID
                 };
 
                 console.log(formData);
                 // Send AJAX request to the server
                 $.ajax({
                     type: 'POST',
-                    url: '/app/product/store',
+                    url: '/app/labour/store',
                     data: formData,
                     dataType: 'json',
                     success: function(data) {

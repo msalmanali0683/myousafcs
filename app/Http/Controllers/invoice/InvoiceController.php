@@ -4,6 +4,15 @@ namespace App\Http\Controllers\invoice;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\CustomerBalance;
+use App\Models\Invoice;
+use App\Models\InvoiceAdjustment;
+use App\Models\InvoiceLabour;
+use App\Models\InvoiceLogistics;
+use App\Models\Labour;
+use App\Models\Logistic;
+use App\Models\Product;
+use App\Models\ProductTransaction;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
@@ -29,7 +38,97 @@ class InvoiceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $logisticData = $request->input('logistic');
+            $labourData = $request->input('labour');
+            $invocie_details = $request->input('user');
+            $adjustmentDetailsData = $request->input('adjustmentDetailsFormData');
+            $productDetailsData = $request->input('productDetailsFormData');
+            // Store data in respective models
+
+            $invoice = Invoice::create([
+                'total_amount' => $invocie_details['grand_amount'],
+                'invoice_type' => $request['invoice_type'],
+                'date' => $invocie_details['date'],
+                'customer_id' => $invocie_details['customer_id'],
+                'user_id' => 1,
+
+            ]);
+
+            // Store adjustment details
+            if ($adjustmentDetailsData) {
+
+                foreach ($adjustmentDetailsData as $adjustmentDetail) {
+                    InvoiceAdjustment::create([
+                        'details' => $adjustmentDetail['description'],
+                        'amount' => $adjustmentDetail['amount'],
+                        'type' => $adjustmentDetail['type'],
+                        'invoice_id' => $invoice->id,
+
+                    ]);
+                }
+            }
+
+            // Store product transactions
+            foreach ($productDetailsData as $productDetail) {
+                // Create ProductTransaction
+                ProductTransaction::create([
+                    'bags' => $productDetail['bags'],
+                    'weight' => $productDetail['weight'],
+                    'rate' => $productDetail['rate'],
+                    'invoice_type' => $request['invoice_type'],
+                    'product_id' => $productDetail['product'],
+                    'invoice_id' => $invoice->id,
+                ]);
+
+                // Update Product quantity
+                $product = Product::find($productDetail['product']);
+                $newQty = $product->qty + floatval($productDetail['weight']);
+                $product->qty = $newQty;
+                $product->save();
+            }
+            if ($logisticData['logistic_type'] == 'own') {
+                $logistic = InvoiceLogistics::create([
+                    'invoice_id' => $invoice->id,
+                    'logistic_id' => $logisticData['logistic_account'],
+                    'amount' => $logisticData['logistic_amount'],
+                    'driver_name' => $logisticData['logistic_driver'],
+                ]);
+            }
+            if ($labourData['labour_type'] == 'own') {
+                $labour = InvoiceLabour::create([
+                    'invoice_id' => $invoice->id,
+                    'labour_id' => $labourData['labour_account'],
+                    'amount' => $labourData['labour_amount'],
+
+                ]);
+            }
+            if ($request['invoice_type'] == 'purchase') {
+                CustomerBalance::create([
+                    'type' => 'debit',
+                    'category' => 'purchase_product',
+                    'amount' =>  $invocie_details['grand_amount'],
+                    'details' => 'Purchase product',
+                    'category_id' => $invocie_details['customer_id'],
+                    'user_id' => 1,
+
+                ]);
+            } else {
+                CustomerBalance::create([
+                    'type' => 'credit',
+                    'category' => 'sale_product',
+                    'amount' =>  $invocie_details['grand_amount'],
+                    'details' => 'Sale product',
+                    'category_id' => $invocie_details['customer_id'],
+                    'user_id' => 1,
+
+                ]);
+            }
+            return response()->json(['message' => 'Customer added successfully'], 201);
+        } catch (\Exception $e) {
+            // Return an error response if something goes wrong
+            return response()->json(['message' => 'Failed to add customer', 'error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -67,11 +166,20 @@ class InvoiceController extends Controller
     public function purchase()
     {
         $customers = Customer::all();
-        return view('Invoice.purchase', ['customers' => $customers]);
+        $logistics = Logistic::all();
+        $labours = Labour::all();
+        $products = Product::all();
+        $invoice = Invoice::latest()->first();
+        return view('Invoice.purchase', ['customers' => $customers, 'logistics' => $logistics, 'labours' => $labours, 'products' => $products, 'invoice' => $invoice]);
     }
 
     public function sale()
     {
-        return view('Invoice.sale');
+        $customers = Customer::all();
+        $logistics = Logistic::all();
+        $labours = Labour::all();
+        $products = Product::all();
+        $invoice = Invoice::latest()->first();
+        return view('Invoice.sale', ['customers' => $customers, 'logistics' => $logistics, 'labours' => $labours, 'products' => $products, 'invoice' => $invoice]);
     }
 }

@@ -49,7 +49,8 @@
                             @endphp
                             @foreach ($logistics as $logistic)
                                 <tr>
-                                    <td class="logistic-id">{{ $i++ }}</td>
+                                    <td>{{ $i++ }}</td>
+                                    <td class="logistic-id">{{ $logistic->id }}</td>
                                     <td class="logistic-name">{{ $logistic->name }}</td>
                                     <td class="logistic-details">{{ $logistic->details }}</td>
                                     <td>
@@ -88,6 +89,11 @@
                                         <label class="form-label" for="name">Logistic Name or Number</label>
                                         <input type="text" id="name" class="form-control"
                                             placeholder="Enter Logistic name or Number ....">
+                                    </div>
+                                    <div class="mb-3 col-12">
+                                        <label class="form-label" for="details">Logistic Details</label>
+                                        <input type="text" id="details" class="form-control"
+                                            placeholder="Enter Logistic details ....">
                                     </div>
                                     <div class="col-8 offset-4">
                                         <button class="btn btn-primary waves-effect waves-light" data-repeater-create="">
@@ -128,6 +134,7 @@
                 var formData = {
                     '_token': $('meta[name="csrf-token"]').attr('content'),
                     'name': $('#name').val(),
+                    'details': $('#details').val(),
                     'id': editlogisticID
                 };
 
@@ -143,7 +150,7 @@
                         console.log('Data inserted successfully:', data);
                         // Optionally, reset the form after successful submission
                         $('#newCustomerform')[0].reset();
-                        window.location.href = "{{ route('app-logistics-list') }}";
+                        window.location.href = "{{ route('app-logistics-create') }}";
                     },
                     error: function(xhr, status, error) {
                         // Handle error response
