@@ -44,9 +44,9 @@
         <div class="row d-flex justify-content-between mb-4">
             <div class="col-sm-6 w-50">
                 <h6>Invoice Details:</h6>
-                <p class="mb-1">Thomas shelby</p>
-                <p class="mb-1">Shelby Company Limited</p>
-                <p class="mb-1">Small Heath, B10 0HF, UK</p>
+                <p class="mb-1">{{ $invoice->customer->name }}</p>
+                <p class="mb-1">{{ $invoice->customer->contact }}</p>
+                <p class="mb-1">{{ $invoice->customer->address }}</p>
             </div>
             <div class="col-sm-6 w-50">
                 <table>
@@ -54,15 +54,15 @@
                     <tbody>
                         <tr>
                             <td class="pe-3">Invoice #</td>
-                            <td class="fw-medium">$12,110.55</td>
+                            <td class="fw-medium">{{ $invoice->id }}</td>
                         </tr>
                         <tr>
                             <td class="pe-3">Date:</td>
-                            <td>American Bank</td>
+                            <td>{{ $invoice->date }}</td>
                         </tr>
                         <tr>
                             <td class="pe-3">Invoice Type:</td>
-                            <td>United States</td>
+                            <td>{{ $invoice->invoice_type }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -71,74 +71,88 @@
 
         <div class="table-responsive">
             <table class="table m-0">
+                @php
+                    $i = 1;
+
+                @endphp
                 <thead class="table-light">
                     <tr>
-                        <th>Item</th>
-                        <th>Description</th>
-                        <th>Cost</th>
-                        <th>Qty</th>
-                        <th>Price</th>
+                        {{-- <th>{{ $invoice }}</th> --}}
+                        <th>#</th>
+                        <th>Product Name</th>
+                        <th>Bags</th>
+                        <th>Total Weight kg</th>
+                        <th>Weight MN-kg</th>
+                        <th>Rate</th>
+                        <th>Total Amount</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Vuexy Admin Template</td>
-                        <td>HTML Admin Template</td>
-                        <td>$32</td>
-                        <td>1</td>
-                        <td>$32.00</td>
-                    </tr>
-                    <tr>
-                        <td>Frest Admin Template</td>
-                        <td>Angular Admin Template</td>
-                        <td>$22</td>
-                        <td>1</td>
-                        <td>$22.00</td>
-                    </tr>
-                    <tr>
-                        <td>Apex Admin Template</td>
-                        <td>HTML Admin Template</td>
-                        <td>$17</td>
-                        <td>2</td>
-                        <td>$34.00</td>
-                    </tr>
-                    <tr>
-                        <td>Robust Admin Template</td>
-                        <td>React Admin Template</td>
-                        <td>$66</td>
-                        <td>1</td>
-                        <td>$66.00</td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" class="align-top px-4 py-3">
-                            <p class="mb-2">
-                                <span class="me-1 fw-medium">Salesperson:</span>
-                                <span>Alfie Solomons</span>
-                            </p>
-                            <span>Thanks for your business</span>
-                        </td>
-                        <td class="text-end px-4 py-3">
-                            <p class="mb-2">Subtotal:</p>
-                            <p class="mb-2">Discount:</p>
-                            <p class="mb-2">Tax:</p>
-                            <p class="mb-0">Total:</p>
-                        </td>
-                        <td class="px-4 py-3">
-                            <p class="fw-medium mb-2">$154.25</p>
-                            <p class="fw-medium mb-2">$00.00</p>
-                            <p class="fw-medium mb-2">$50.00</p>
-                            <p class="fw-medium mb-0">$204.25</p>
-                        </td>
-                    </tr>
+                    @foreach ($invoice['product_transactions'] as $transaction)
+                        <tr>
+                            <td>{{ $i++ }}</td>
+                            <td>{{ $transaction['product']['name'] }}</td>
+                            <td>{{ $transaction['bags'] }}</td>
+                            <td>{{ $transaction['weight'] }}</td>
+                            <td>{{ intval(floatval($transaction['weight']) / 40) }}
+                                - {{ floatval($transaction['weight']) % 40 }}
+                            </td>
+                            <td>{{ $transaction['rate'] }}</td>
+                            <td>{{ intval(floatval($transaction['weight']) / 40) * floatval($transaction['rate']) + (floatval($transaction['weight']) % 40) * (floatval($transaction['rate']) / 40) }}
+                            </td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
+        <hr />
+
+        @if (!empty($invoice['adjustment']) && count($invoice['adjustment']) > 0)
+            <div class="table-responsive">
+                <table class="table m-0">
+                    @php
+                        $i = 1;
+                    @endphp
+                    <thead class="table-light">
+                        <tr>
+                            {{-- <th>{{ $invoice }}</th> --}}
+                            <th>#</th>
+                            <th>Details</th>
+                            <th>Adjustment Type</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($invoice['adjustment'] as $adjustment)
+                            <tr>
+                                <td>{{ $i++ }}</td>
+                                <td>{{ $adjustment['details'] }}</td>
+                                <td>{{ $adjustment['type'] }}</td>
+                                <td>{{ $adjustment['amount'] }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+
 
         <div class="row">
+            <div class="col-9">
+
+            </div>
+            <div class="col-3">
+                <hr />
+                <span class="fw-medium">Total Amount:</span>
+                <span>{{ $invoice->total_amount }}</span>
+                <hr />
+            </div>
+        </div>
+        <div class="row">
             <div class="col-12">
-                <span class="fw-medium">Note:</span>
+                {{-- <span class="fw-medium">Note:</span>
                 <span>It was a pleasure working with you and your team. We hope you will keep us in mind for future
-                    freelance projects. Thank You!</span>
+                    freelance projects. Thank You!</span> --}}
             </div>
         </div>
     </div>

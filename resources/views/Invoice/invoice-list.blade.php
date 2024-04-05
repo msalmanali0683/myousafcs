@@ -90,20 +90,78 @@
             <table class="invoice-list-table table border-top">
                 <thead>
                     <tr>
-                        <th></th>
                         <th>#ID</th>
-                        <th><i class='ti ti-trending-up text-secondary'></i></th>
-                        <th>Client</th>
-                        <th>Total</th>
-                        <th class="text-truncate">Issued Date</th>
+                        <th>Customer</th>
+                        <th>Product</th>
+                        <th class="text-truncate">Date</th>
                         <th>Balance</th>
-                        <th>Invoice Status</th>
+                        <th>Invoice Type</th>
                         <th class="cell-fit">Actions</th>
                     </tr>
                 </thead>
+                <tbody>
+                    @php
+                        $i = 1;
+                        $product_name = '';
+                    @endphp
+                    @foreach ($invoices as $invoice)
+                        @foreach ($invoice['product_transactions'] as $transaction)
+                            @php
+                                $product_name = $transaction['product']['name'];
+                            @endphp
+                            {{-- Break out of the loop after setting product name --}}
+                        @break
+                    @endforeach
+                    <tr>
+                        <td> #{{ $i++ }}</td>
+                        <td>
+                            <div class="d-flex justify-content-start align-items-center">
+                                <div class="avatar-wrapper">
+                                    <div class="avatar me-2"><span
+                                            class="avatar-initial rounded-circle bg-label-info">{{ substr($invoice->customer->name, 0, 2) }}</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-column"><a href="#" class="text-body text-truncate"><span
+                                            class="fw-medium">{{ $invoice->customer->name }}</span></a><small
+                                        class="text-truncate text-muted">{{ $invoice->customer->contact }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td> {{ $product_name }}</td>
+                        <td> {{ $invoice->date }}</td>
+                        <td> {{ $invoice->total_amount }}</td>
+                        <td> {{ $invoice->invoice_type }}</td>
+                        {{-- <td class="sorting_1"><a
+                                    href="https://demos.pixinvent.com/vuexy-html-laravel-admin-template/demo-1/app/invoice/preview">#5089</a>
+                            </td> --}}
 
-            </table>
-        </div>
+
+                        <td>
+                            <div class="d-flex align-items-center"><a
+                                    href="{{ route('app-invoice-show', $invoice->id) }}" data-bs-toggle="tooltip"
+                                    class="text-body" data-bs-placement="top" aria-label="Preview Invoice"
+                                    data-bs-original-title="Print Invoice"><i class="ti ti-eye mx-2 ti-sm"></i></a>
+                                <div class="dropdown"><a href="javascript:;"
+                                        class="btn dropdown-toggle hide-arrow text-body p-0"
+                                        data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-sm"></i></a>
+                                    <div class="dropdown-menu dropdown-menu-end"><a href="javascript:;"
+                                            class="dropdown-item">Download</a><a
+                                            href="https://demos.pixinvent.com/vuexy-html-laravel-admin-template/demo-1/app/invoice/edit"
+                                            class="dropdown-item">Edit</a><a href="javascript:;"
+                                            class="dropdown-item">Duplicate</a>
+                                        <div class="dropdown-divider"></div><a href="javascript:;"
+                                            class="dropdown-item delete-record text-danger">Delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                @endforeach
+
+
+            </tbody>
+        </table>
     </div>
+</div>
 
 @endsection
