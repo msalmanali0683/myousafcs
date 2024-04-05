@@ -34,6 +34,16 @@ Route::get('/clear', function () {
     return '<h1>Cache facade value cleared</h1>';
 });
 
+Route::get('/migrate-fresh', function () {
+    $exitCode = Artisan::call('migrate:fresh');
+    return '<h1>Migrate Fresh</h1>';
+});
+
+Route::get('/migrate', function () {
+    $exitCode = Artisan::call('migrate');
+    return '<h1>Migrate Fresh</h1>';
+});
+
 
 // Main Page Route
 Route::get('/', [HomePage::class, 'index'])->name('pages-home');
@@ -52,6 +62,8 @@ Route::get('/auth/register-basic', [RegisterBasic::class, 'index'])->name('auth-
 
 Route::get('/app/invoice/purchase', [InvoiceController::class, 'purchase'])->name('app-invoice-purchase');
 Route::get('/app/invoice/sale', [InvoiceController::class, 'sale'])->name('app-invoice-sale');
+Route::get('/app/invoice/preview/{id}', [InvoiceController::class, 'show'])->name('app-invoice-show');
+Route::get('/app/invoice/list', [InvoiceController::class, 'list'])->name('app-invoice-list');
 Route::post('/app/ecommerce/invoice/store', [InvoiceController::class, 'store'])->name('app-invoice-store');
 
 

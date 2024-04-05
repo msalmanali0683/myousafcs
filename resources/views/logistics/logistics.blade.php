@@ -40,6 +40,7 @@
                                 <th>#</th>
                                 <th>Name</th>
                                 <th>Details</th>
+                                <th>Balance</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -50,9 +51,10 @@
                             @foreach ($logistics as $logistic)
                                 <tr>
                                     <td>{{ $i++ }}</td>
-                                    <td class="logistic-id">{{ $logistic->id }}</td>
+                                    <td class="logistic-id" hidden>{{ $logistic->id }}</td>
                                     <td class="logistic-name">{{ $logistic->name }}</td>
                                     <td class="logistic-details">{{ $logistic->details }}</td>
+                                    <td class="logistic-details">{{ $logistic->balance }}</td>
                                     <td>
                                         <div class="dropdown">
                                             <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
@@ -120,8 +122,6 @@
                 // Retrieve the product name from the table row
                 var logisticName = $(this).closest('tr').find('.logistic-name').text().trim();
                 editlogisticID = $(this).closest('tr').find('.logistic-id').text().trim();
-                console.log('working');
-                console.log(editlogisticID);
                 // Set the retrieved logistic name as the value of the input field
                 $('#name').val(logisticName);
             });

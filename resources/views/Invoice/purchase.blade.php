@@ -52,6 +52,23 @@
         -moz-appearance: textfield;
         /* Firefox */
     }
+
+    @media print {
+
+        /* Hide elements not needed in print preview */
+        .invoice-add,
+        .modal-onboarding,
+        .modal-backdrop {
+            display: none !important;
+        }
+
+        /* Adjustments for elements needed in print preview */
+        #invoiceId {
+            display: block !important;
+        }
+
+        /* Add additional styles as needed */
+    }
 </style>
 
 @section('content')

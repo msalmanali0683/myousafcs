@@ -32,6 +32,11 @@ class InvoiceController extends Controller
     {
         //
     }
+    public function list()
+    {
+        $invoice = Invoice::all();
+        return view('Invoice.invoice-list');
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -94,6 +99,11 @@ class InvoiceController extends Controller
                     'amount' => $logisticData['logistic_amount'],
                     'driver_name' => $logisticData['logistic_driver'],
                 ]);
+
+                $logistic = Logistic::find($logisticData['logistic_account']);
+                $newQty = $logistic->balance + floatval($logisticData['logistic_amount']);
+                $logistic->balance = $newQty;
+                $logistic->save();
             }
             if ($labourData['labour_type'] == 'own') {
                 $labour = InvoiceLabour::create([
@@ -102,6 +112,11 @@ class InvoiceController extends Controller
                     'amount' => $labourData['labour_amount'],
 
                 ]);
+
+                $labour = Labour::find($labourData['labour_account']);
+                $newQty = $labour->balance + floatval($labourData['labour_amount']);
+                $labour->balance = $newQty;
+                $labour->save();
             }
             if ($request['invoice_type'] == 'purchase') {
                 CustomerBalance::create([
@@ -136,7 +151,7 @@ class InvoiceController extends Controller
      */
     public function show(string $id)
     {
-        //
+        return view('Invoice.invoice-print');
     }
 
     /**

@@ -4,7 +4,7 @@ return [
   "creatorName" => "Salman",
   "creatorUrl" => "http://myosafcs  .com",
   "templateName" => "MYousafCS",
-  "templateSuffix" => "Bootstrap Admin Template",
+  "templateSuffix" => "Shop",
   "templateVersion" => "1.0.0",
   "templateFree" => false,
   "templateDescription" => "Start your development with a Dashboard for Bootstrap 5",

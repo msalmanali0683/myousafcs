@@ -37,16 +37,6 @@
           "url": "app/invoice/list",
           "name": "List",
           "slug": "app-invoice-list"
-        },
-        {
-          "url": "app/invoice/preview",
-          "name": "Preview",
-          "slug": "app-invoice-preview"
-        },
-        {
-          "url": "app/invoice/edit",
-          "name": "Edit",
-          "slug": "app-invoice-edit"
         }
       ]
     },
