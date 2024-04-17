@@ -153,8 +153,8 @@
                                     <dd class="col-sm-6 d-flex justify-content-md-end pe-0 ps-0 ps-sm-2">
                                         <div class="input-group input-group-merge disabled w-px-150">
                                             <span class="input-group-text">#</span>
-                                            <input type="text" class="form-control" disabled
-                                                value="{{ $invoice->id ? $invoice->id + 1 : 1 }}" id="invoiceId" />
+                                            <input type="text" class="form-control" disabled value="{{ isset($invoice) && $invoice->id ? $invoice->id + 1 : 1 }}" id="invoiceId" />
+
 
                                         </div>
                                     </dd>
@@ -547,11 +547,8 @@
                 data: formData,
                 dataType: 'json',
                 success: function(data) {
-                    // Handle success response
-                    console.log('Data inserted successfully:', data);
-                    // window.location.reload();
-                    // // Optionally, reset the form after successful submission
-                    // $('#newCustomerform')[0].reset();
+                    window.location.href = '/app/invoice/preview/' + data.invoice_id;
+
                 },
                 error: function(xhr, status, error) {
                     // Handle error response
@@ -635,7 +632,7 @@
             $form.find('#weight_mn').val((weight / 40).toFixed(0));
             $form.find('#weight_kg').val((weight % 40).toFixed(0));
 
-            var totalAmount = weight_mn * rate;
+            var totalAmount = weight * (rate/40);
             $form.find('#total_amount').val(totalAmount.toFixed(2));
 
             // Calculate and update the grand total

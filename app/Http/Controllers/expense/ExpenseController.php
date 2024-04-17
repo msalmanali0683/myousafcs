@@ -1,26 +1,22 @@
 <?php
 
-namespace App\Http\Controllers\logistics;
+namespace App\Http\Controllers\expense;
 
 use App\Http\Controllers\Controller;
 use App\Models\CustomerBalance;
-use App\Models\Logistic;
+use App\Models\Expense;
 use Illuminate\Http\Request;
 
-class LogisticsController extends Controller
+class ExpenseController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $logistics = Logistic::all();
-        return view('logistics.logistics', ['logistics' => $logistics]);
-    }
 
-    public function dashboard()
-    {
-        return view('logistics.index');
+        $expenses = Expense::all();
+        return view('expense.index', ['expenses' => $expenses]);
     }
 
     /**
@@ -38,38 +34,35 @@ class LogisticsController extends Controller
     {
         // Validate the incoming request data
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'details' => 'string|max:255',
+            'name' => 'required|string|max:255|unique:products',
         ]);
 
         try {
-            // Create a new Customer instance
             if ($request->id) {
-                $logistic =  Logistic::find($request->id);
+                // Update Customer instance
+                $expense =  Expense::find($request->id);
 
                 // Assign values from the request
-                $logistic->name = $validatedData['name'];
-                $logistic->details = $validatedData['details'];
+                $expense->name = $validatedData['name'];
 
-                // Save the logistic record
-                $logistic->save();
+                // Save the expense record
+                $expense->save();
             } else {
-                $logistic = new Logistic();
+                // Create a new Customer instance
+                $expense = new Expense();
 
                 // Assign values from the request
-                $logistic->name = $validatedData['name'];
-                $logistic->details = $validatedData['details'];
+                $expense->name = $validatedData['name'];
 
-                // Save the logistic record
-                $logistic->save();
+                // Save the expense record
+                $expense->save();
             }
 
-
             // Return a success response
-            return response()->json(['message' => 'Customer added successfully'], 201);
+            return response()->json(['message' => 'Expense added successfully'], 201);
         } catch (\Exception $e) {
             // Return an error response if something goes wrong
-            return response()->json(['message' => 'Failed to add customer', 'error' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Failed to add Expense', 'error' => $e->getMessage()], 500);
         }
     }
 
@@ -79,23 +72,23 @@ class LogisticsController extends Controller
     public function show(string $id)
     {
         $customerBalance = CustomerBalance::where('category_id', $id)
-            ->where('category', 'labour')
+            ->where('category', 'expense')
             ->get();
         $totalDebit = CustomerBalance::where('category_id', $id)
-            ->where('category', 'labour')
+            ->where('category', 'expense')
             ->where('type', 'debit')
             ->sum('amount');
         $totalCredit = CustomerBalance::where('category_id', $id)
-            ->where('category', 'labour')
+            ->where('category', 'expense')
             ->where('type', 'credit')
             ->sum('amount');
 
 
         // Retrieve customer details
-        $customer = Logistic::findOrFail($id);
+        $customer = Expense::findOrFail($id);
 
         // Pass the data to the view
-        return view('logistics.view', compact('customer', 'customerBalance', 'totalDebit', 'totalCredit'));
+        return view('expense.view', compact('customer', 'customerBalance', 'totalDebit', 'totalCredit'));
     }
 
     /**

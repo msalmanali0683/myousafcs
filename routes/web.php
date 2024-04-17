@@ -9,6 +9,8 @@ use App\Http\Controllers\authentications\LoginBasic;
 use App\Http\Controllers\authentications\RegisterBasic;
 use App\Http\Controllers\Banks\BankController;
 use App\Http\Controllers\customer\CustomerController;
+use App\Http\Controllers\employee\EmployeeController;
+use App\Http\Controllers\expense\ExpenseController;
 use App\Http\Controllers\invoice\InvoiceController;
 use App\Http\Controllers\labour\LabourController;
 use App\Http\Controllers\logistics\LogisticsController;
@@ -29,13 +31,14 @@ use Illuminate\Support\Facades\Artisan;
 */
 
 Route::get('/clear', function () {
-    $exitCode = Artisan::call('cache:clear');
-    $exitCode = Artisan::call('optimize');
+    Artisan::call('cache:clear');
+    Artisan::call('route:clear');
+    Artisan::call('optimize');
     return '<h1>Cache facade value cleared</h1>';
 });
 
 Route::get('/migrate-fresh', function () {
-    $exitCode = Artisan::call('migrate:fresh');
+    $exitCode = Artisan::call('migrate:fresh --seed');
     return '<h1>Migrate Fresh</h1>';
 });
 
@@ -65,6 +68,11 @@ Route::get('/app/invoice/sale', [InvoiceController::class, 'sale'])->name('app-i
 Route::get('/app/invoice/preview/{id}', [InvoiceController::class, 'show'])->name('app-invoice-show');
 Route::get('/app/invoice/list', [InvoiceController::class, 'list'])->name('app-invoice-list');
 Route::post('/app/ecommerce/invoice/store', [InvoiceController::class, 'store'])->name('app-invoice-store');
+Route::get('/app/ecommerce/invoice/download-pdf/{id}', [InvoiceController::class, 'downloadPDF'])->name('download.pdf');
+
+Route::post('/app/transaction/save', [InvoiceController::class, 'transaction'])->name('app-invoice-transaction');
+
+
 
 
 Route::get('/app/user/list', [UsersController::class, 'index'])->name('app-user-list');
@@ -80,14 +88,28 @@ Route::post('/app/ecommerce/customer/create/store', [CustomerController::class, 
 Route::get('/app/ecommerce/customer/edit/{id}', [CustomerController::class, 'edit'])->name('customer.edit');
 Route::post('/app/ecommerce/customer/update/{id}', [CustomerController::class, 'update'])->name('app-ecommerce-customer-update');
 
+Route::get('/app/ecommerce/customer/show/{id}', [CustomerController::class, 'show'])->name('app-ecommerce-customer-show');
+
 
 
 Route::get('/app/logistics/dashboard', [LogisticsController::class, 'dashboard'])->name('app-logistics-dashboard');
 Route::get('/app/logistics/create', [LogisticsController::class, 'index'])->name('app-logistics-create');
 Route::post('/app/logistics/store', [LogisticsController::class, 'store'])->name('app-logistics-store');
+Route::get('/app/logistics/show/{id}', [LogisticsController::class, 'show'])->name('app-logistics-show');
 
 Route::get('/app/banks/all', [BankController::class, 'index'])->name('app-banks-all');
 Route::post('/app/banks/store', [BankController::class, 'store'])->name('app-banks-store');
+Route::get('/app/bank/show/{id}', [BankController::class, 'show'])->name('app-bank-show');
 
 Route::get('/app/employee/labour', [LabourController::class, 'index'])->name('app-employee-labour');
 Route::post('/app/labour/store', [LabourController::class, 'store'])->name('app-labour-store');
+Route::get('/app/employee/labour/show/{id}', [LabourController::class, 'show'])->name('app-employee-labour-show');
+
+Route::get('/app/employee/employee', [EmployeeController::class, 'index'])->name('app-employee-employee');
+Route::post('/app/employee/store', [EmployeeController::class, 'store'])->name('app-employee-store');
+Route::get('/app/employee/show/{id}', [EmployeeController::class, 'show'])->name('app-employee-show');
+
+
+Route::get('/app/expense', [ExpenseController::class, 'index'])->name('app-expense');
+Route::post('/app/expense/store', [ExpenseController::class, 'store'])->name('app-expense-store');
+Route::get('/app/expense/show/{id}', [ExpenseController::class, 'show'])->name('app-expense-show');

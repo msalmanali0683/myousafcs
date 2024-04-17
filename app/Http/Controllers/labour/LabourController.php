@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\labour;
 
 use App\Http\Controllers\Controller;
+use App\Models\CustomerBalance;
 use App\Models\Labour;
 use Illuminate\Http\Request;
 
@@ -70,7 +71,24 @@ class LabourController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $customerBalance = CustomerBalance::where('category_id', $id)
+            ->where('category', 'labour')
+            ->get();
+        $totalDebit = CustomerBalance::where('category_id', $id)
+            ->where('category', 'labour')
+            ->where('type', 'debit')
+            ->sum('amount');
+        $totalCredit = CustomerBalance::where('category_id', $id)
+            ->where('category', 'labour')
+            ->where('type', 'credit')
+            ->sum('amount');
+
+
+        // Retrieve customer details
+        $customer = Labour::findOrFail($id);
+
+        // Pass the data to the view
+        return view('labour.view', compact('customer', 'customerBalance', 'totalDebit', 'totalCredit'));
     }
 
     /**

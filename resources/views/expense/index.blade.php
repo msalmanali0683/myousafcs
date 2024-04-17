@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Product List - Apps')
+@section('title', 'Employee')
 
 @section('vendor-style')
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
@@ -14,10 +14,9 @@
     <script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
 @endsection
 
-
 @section('content')
     <h4 class="py-3 mb-4">
-        <span class="text-muted fw-light"></span> Product Details
+        <span class="text-muted fw-light"></span> Expense Details
     </h4>
     <div class="row">
         <div class="col-12 col-lg-9">
@@ -36,8 +35,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Name</th>
-                                <th>Stock (MN)</th>
-                                <th>Stock (KG)</th>
+                                <th>Balance</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -45,13 +43,15 @@
                             @php
                                 $i = 1;
                             @endphp
-                            @foreach ($products as $product)
+                            @foreach ($expenses as $expense)
                                 <tr>
                                     <td>{{ $i++ }}</td>
-                                    <td class="product-id" hidden>{{ $product->id }}</td>
-                                    <td class="product-name">{{ $product->name }}</td>
-                                    <td>0</td>
-                                    <td>0</td>
+                                    <td class="expense-id" hidden>{{ $expense->id }}</td>
+                                    <td class="expense-name">
+                                        <a href="{{ route('app-expense-show', $expense->id) }}" class="dropdown-item">
+                                            {{ $expense->name }}</a>
+                                    </td>
+                                    <td>{{ $expense->balance }}</td>
                                     <td>
                                         <div class="dropdown">
                                             <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
@@ -71,14 +71,13 @@
                             @endforeach
                         </tbody>
                     </table>
-                    {{ $products->links() }}
                 </div>
             </div>
         </div>
         <div class="col-12 col-lg-3">
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Add new Product</h5>
+                    <h5 class="card-title mb-0">Add new Expense</h5>
                 </div>
                 <div class="card-body">
                     <form id="newCustomerform" class="form-repeater">
@@ -86,9 +85,9 @@
                             <div data-repeater-item="">
                                 <div class="row">
                                     <div class="mb-3 col-12">
-                                        <label class="form-label" for="name">Product Name</label>
+                                        <label class="form-label" for="name">Expense Name</label>
                                         <input type="text" id="name" class="form-control"
-                                            placeholder="Enter product name ....">
+                                            placeholder="Enter Expense name ....">
                                     </div>
                                     <div class="col-8 offset-4">
                                         <button class="btn btn-primary waves-effect waves-light" data-repeater-create="">
@@ -110,15 +109,15 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         $(document).ready(function() {
-            var editProductID = null;
+            var editexpenseID = null;
             $('.dropdown-menu').on('click', '.edit', function() {
                 // Retrieve the product name from the table row
-                var productName = $(this).closest('tr').find('.product-name').text().trim();
-                editProductID = $(this).closest('tr').find('.product-id').text().trim();
+                var expenseName = $(this).closest('tr').find('.expense-name').text().trim();
+                editexpenseID = $(this).closest('tr').find('.expense-id').text().trim();
                 console.log('working');
-                console.log(productName);
-                // Set the retrieved product name as the value of the input field
-                $('#name').val(productName);
+                console.log(editexpenseID);
+                // Set the retrieved expense name as the value of the input field
+                $('#name').val(expenseName);
             });
 
             $('#newCustomerform').submit(function(event) {
@@ -129,14 +128,14 @@
                 var formData = {
                     '_token': $('meta[name="csrf-token"]').attr('content'),
                     'name': $('#name').val(),
-                    'id': editProductID
+                    'id': editexpenseID
                 };
 
                 console.log(formData);
                 // Send AJAX request to the server
                 $.ajax({
                     type: 'POST',
-                    url: '/app/product/store',
+                    url: '/app/expense/store',
                     data: formData,
                     dataType: 'json',
                     success: function(data) {
@@ -144,6 +143,7 @@
                         console.log('Data inserted successfully:', data);
                         // Optionally, reset the form after successful submission
                         $('#newCustomerform')[0].reset();
+                        window.location.href = "{{ route('app-expense') }}";
                     },
                     error: function(xhr, status, error) {
                         // Handle error response

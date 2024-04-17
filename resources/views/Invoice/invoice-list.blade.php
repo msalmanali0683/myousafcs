@@ -121,7 +121,10 @@
                                             class="avatar-initial rounded-circle bg-label-info">{{ substr($invoice->customer->name, 0, 2) }}</span>
                                     </div>
                                 </div>
-                                <div class="d-flex flex-column"><a href="#" class="text-body text-truncate"><span
+
+                                <div class="d-flex flex-column"><a
+                                        href="{{ route('app-ecommerce-customer-show', $invoice->customer->id) }}"
+                                        class="text-body text-truncate"><span
                                             class="fw-medium">{{ $invoice->customer->name }}</span></a><small
                                         class="text-truncate text-muted">{{ $invoice->customer->contact }}</small>
                                 </div>
@@ -144,9 +147,10 @@
                                 <div class="dropdown"><a href="javascript:;"
                                         class="btn dropdown-toggle hide-arrow text-body p-0"
                                         data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-sm"></i></a>
-                                    <div class="dropdown-menu dropdown-menu-end"><a href="javascript:;"
+                                    <div class="dropdown-menu dropdown-menu-end"><a
+                                            href="{{ route('download.pdf', $invoice->id) }}"
                                             class="dropdown-item">Download</a><a
-                                            href="https://demos.pixinvent.com/vuexy-html-laravel-admin-template/demo-1/app/invoice/edit"
+                                            href="{{ route('download.pdf', $invoice->id) }}"
                                             class="dropdown-item">Edit</a><a href="javascript:;"
                                             class="dropdown-item">Duplicate</a>
                                         <div class="dropdown-divider"></div><a href="javascript:;"

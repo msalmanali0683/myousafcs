@@ -51,7 +51,10 @@
                                 <tr>
                                     <td>{{ $i++ }}</td>
                                     <td class="labour-id" hidden>{{ $labour->id }}</td>
-                                    <td class="labour-name">{{ $labour->name }}</td>
+                                    <td class="labour-name">
+                                        <a href="{{ route('app-employee-labour-show', $labour->id) }}"
+                                            class="dropdown-item">{{ $labour->name }}</a>
+                                    </td>
                                     <td>{{ $labour->balance }}</td>
                                     <td>
                                         <div class="dropdown">
@@ -144,6 +147,7 @@
                         console.log('Data inserted successfully:', data);
                         // Optionally, reset the form after successful submission
                         $('#newCustomerform')[0].reset();
+                        window.location.href = "{{ route('app-employee-labour') }}";
                     },
                     error: function(xhr, status, error) {
                         // Handle error response

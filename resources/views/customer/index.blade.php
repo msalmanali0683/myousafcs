@@ -84,10 +84,11 @@
                     @foreach ($customers as $customer)
                         <tr>
                             <td>{{ $i++ }}</td>
-                            <td class="text-nowrap">{{ $customer->name }}</td>
+                            <td class="text-nowrap"><a href="{{ route('app-ecommerce-customer-show', $customer->id) }}"
+                                    class="dropdown-item">{{ $customer->name }}</a></td>
                             <td>{{ $customer->contact }}</td>
                             <td>{{ $customer->address }}</td>
-                            <td class="text-nowrap">1235467820 Cr</td>
+                            <td class="text-nowrap">{{ $customer->balance }}</td>
                             <td>
                                 <div class="dropdown">
                                     <button type="button" class="btn p-0 dropdown-toggle hide-arrow"

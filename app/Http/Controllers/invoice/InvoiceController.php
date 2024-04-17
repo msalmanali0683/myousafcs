@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\invoice;
 
+use PDF;
 use App\Http\Controllers\Controller;
+use App\Models\Bank;
 use App\Models\Customer;
 use App\Models\CustomerBalance;
+use App\Models\Employee;
+use App\Models\Expense;
 use App\Models\Invoice;
 use App\Models\InvoiceAdjustment;
 use App\Models\InvoiceLabour;
@@ -13,7 +17,9 @@ use App\Models\Labour;
 use App\Models\Logistic;
 use App\Models\Product;
 use App\Models\ProductTransaction;
+use Dompdf\Dompdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
 
 class InvoiceController extends Controller
 {
@@ -124,6 +130,7 @@ class InvoiceController extends Controller
                     'category' => 'purchase_product',
                     'amount' =>  $invocie_details['grand_amount'],
                     'details' => 'Purchase product',
+                    'account' => $invoice->id,
                     'category_id' => $invocie_details['customer_id'],
                     'user_id' => 1,
 
@@ -134,12 +141,13 @@ class InvoiceController extends Controller
                     'category' => 'sale_product',
                     'amount' =>  $invocie_details['grand_amount'],
                     'details' => 'Sale product',
+                    'account' => $invoice->id,
                     'category_id' => $invocie_details['customer_id'],
                     'user_id' => 1,
 
                 ]);
             }
-            return response()->json(['message' => 'Customer added successfully'], 201);
+            return response()->json(['message' => 'Invoice added successfully', 'invoice_id' => $invoice->id], 201);
         } catch (\Exception $e) {
             // Return an error response if something goes wrong
             return response()->json(['message' => 'Failed to add customer', 'error' => $e->getMessage()], 500);
@@ -170,6 +178,26 @@ class InvoiceController extends Controller
     {
         //
     }
+    public function downloadPDF(string $id)
+    {
+        $invoice = Invoice::with('customer', 'product_transactions.product', 'adjustment')->where('id', $id)->first();
+        $html = View::make('Invoice.invoice-print', compact('invoice'))->render();
+
+        // Create a new Dompdf instance
+        $dompdf = new Dompdf();
+
+        // Load the HTML content into Dompdf
+        $dompdf->loadHtml($html);
+
+        // Render the PDF
+        $dompdf->render();
+
+        // Output the generated PDF (download or display)
+        return $dompdf->stream('document.pdf');
+
+        // Output the generated PDF (download or display)
+        return $dompdf->stream('document.pdf');
+    }
 
     /**
      * Remove the specified resource from storage.
@@ -197,5 +225,92 @@ class InvoiceController extends Controller
         $products = Product::all();
         $invoice = Invoice::latest()->first();
         return view('Invoice.sale', ['customers' => $customers, 'logistics' => $logistics, 'labours' => $labours, 'products' => $products, 'invoice' => $invoice]);
+    }
+
+    public function transaction(Request $request)
+    {
+        try {
+            CustomerBalance::create([
+                'type' => $request['type'],
+                'category' => $request['category'],
+                'category_id' =>  $request['category_id'],
+                'details' =>  $request['details'],
+                'account' =>  $request['account'],
+                'amount' =>  $request['amount'],
+                'user_id' => 1,
+
+            ]);
+            $bank = Bank::find($request['account']);
+            if ($request['type'] == 'debit') {
+                $bank->balance = $bank->balance +  $request['amount'];
+            } else {
+                $bank->balance = $bank->balance -  $request['amount'];
+            }
+
+            if ($request['category'] == 'customer') {
+                $oldBlance = Customer::find($request['category_id']);
+                if ($request['type'] == 'debit') {
+                    $balance = $oldBlance->balance + $request['amount'];
+                    $oldBlance->balance = $balance;
+                } else {
+                    $balance = $oldBlance->balance - $request['amount'];
+
+                    $oldBlance->balance = $balance;
+                }
+                $oldBlance->save();
+            } else if ($request['category'] == 'employee') {
+                $oldBlance = Employee::find($request['category_id']);
+                if ($request['type'] == 'debit') {
+                    $balance = $oldBlance->balance + $request['amount'];
+                    $oldBlance->balance = $balance;
+                } else {
+                    $balance = $oldBlance->balance - $request['amount'];
+
+                    $oldBlance->balance = $balance;
+                }
+                $oldBlance->save();
+            } else if ($request['category'] == 'expense') {
+                $oldBlance = Expense::find($request['category_id']);
+                if ($request['type'] == 'debit') {
+                    $balance = $oldBlance->balance + $request['amount'];
+                    $oldBlance->balance = $balance;
+                } else {
+                    $balance = $oldBlance->balance - $request['amount'];
+
+                    $oldBlance->balance = $balance;
+                }
+                $oldBlance->save();
+            } else if ($request['category'] == 'logistics') {
+                $oldBlance = Logistic::find($request['category_id']);
+                if ($request['type'] == 'debit') {
+                    $balance = $oldBlance->balance + $request['amount'];
+                    $oldBlance->balance = $balance;
+                } else {
+                    $balance = $oldBlance->balance - $request['amount'];
+
+                    $oldBlance->balance = $balance;
+                }
+                $oldBlance->save();
+            } else if ($request['category'] == 'labour') {
+                $oldBlance = Labour::find($request['category_id']);
+                if ($request['type'] == 'debit') {
+                    $balance = $oldBlance->balance + $request['amount'];
+                    $oldBlance->balance = $balance;
+                } else {
+                    $balance = $oldBlance->balance - $request['amount'];
+
+                    $oldBlance->balance = $balance;
+                }
+                $oldBlance->save();
+            }
+
+
+
+
+            return response()->json(['message' => 'Transaction completed successfully'], 201);
+        } catch (\Exception $e) {
+            // Return an error response if something goes wrong
+            return response()->json(['message' => 'Failed to add transaction', 'error' => $e->getMessage()], 500);
+        }
     }
 }

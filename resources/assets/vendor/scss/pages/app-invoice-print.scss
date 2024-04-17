@@ -10,7 +10,7 @@ body {
 }
 
 body > :not(.invoice-print) {
-  display: none !important;
+  display: none  !important;
 }
 
 .invoice-print {

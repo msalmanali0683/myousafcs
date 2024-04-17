@@ -4,7 +4,9 @@ namespace App\Http\Controllers\customer;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\CustomerBalance;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -68,7 +70,46 @@ class CustomerController extends Controller
      */
     public function show(string $id)
     {
-        //
+        // Retrieve customer balance records for the specified category ID
+        $customerBalance = CustomerBalance::where('category_id', $id)
+            ->where(function ($query) use ($id) {
+                $query->where('category', 'purchase_product')
+                    ->orWhere('category', 'sale_product')
+                    ->orWhere(function ($query) use ($id) {
+                        $query->where('category', 'customer')
+                            ->where('category_id', $id);
+                    });
+            })
+            ->get();
+        $totalDebit = CustomerBalance::where('category_id', $id)
+            ->where(function ($query) use ($id) {
+                $query->where('category', 'purchase_product')
+                    ->orWhere('category', 'sale_product')
+                    ->orWhere(function ($query) use ($id) {
+                        $query->where('category', 'customer')
+                            ->where('category_id', $id);
+                    });
+            })
+            ->where('type', 'debit')
+            ->sum('amount');
+        $totalCredit = CustomerBalance::where('category_id', $id)
+            ->where(function ($query) use ($id) {
+                $query->where('category', 'purchase_product')
+                    ->orWhere('category', 'sale_product')
+                    ->orWhere(function ($query) use ($id) {
+                        $query->where('category', 'customer')
+                            ->where('category_id', $id);
+                    });
+            })
+            ->where('type', 'credit')
+            ->sum('amount');
+
+
+        // Retrieve customer details
+        $customer = Customer::findOrFail($id);
+
+        // Pass the data to the view
+        return view('customer.view', compact('customer', 'customerBalance', 'totalDebit', 'totalCredit'));
     }
 
     /**

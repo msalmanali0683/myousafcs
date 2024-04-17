@@ -41,19 +41,14 @@
       ]
     },
     {
-      "name": "Product",
+      "name": "Products",
       "icon": "menu-icon tf-icons ti ti-layout-grid",
       "slug": "app-product",
       "submenu": [
         {
           "url": "app/product/list",
-          "name": "All Products",
+          "name": "New & List",
           "slug": "app-product-list"
-        },
-        {
-          "url": "app/academy/course-details",
-          "name": "Add New Product",
-          "slug": "app-academy-course-details"
         }
       ]
     },
@@ -80,13 +75,8 @@
       "slug": "app-logistics",
       "submenu": [
         {
-          "url": "app/logistics/dashboard",
-          "name": "Dashboard",
-          "slug": "app-logistics-dashboard"
-        },
-        {
           "url": "app/logistics/create",
-          "name": "All Vehicle",
+          "name": "New & List",
           "slug": "app-logistics-create"
         }
       ]
@@ -97,19 +87,30 @@
       "slug": "app-employee",
       "submenu": [
         {
-          "url": "app/employee/labour",
+          "url": "app/employee/employee",
+          "name": "Employee",
+          "slug": "app-employee-employee"
+        },
+        {
+          "url": "/app/employee/labour",
           "name": "Labour",
           "slug": "app-employee-labour"
-        },
+        }
+      ]
+    },
+    {
+      "name": "Expenses",
+      "icon": "menu-icon tf-icons ti ti-currency",
+      "slug": "app-expence",
+      "badge": [
+        "danger",
+        ""
+      ],
+      "submenu": [
         {
-          "url": "app/ecommerce/customer/all",
-          "name": "All Employes",
-          "slug": "app-ecommerce-customer-all"
-        },
-        {
-          "url": "app/ecommerce/customer/create",
-          "name": "New Employee",
-          "slug": "app-ecommerce-customer-create"
+          "url": "app/expense",
+          "name": "Expense",
+          "slug": "app-expense"
         }
       ]
     },
@@ -120,13 +121,8 @@
       "submenu": [
         {
           "url": "app/banks/all",
-          "name": "Banks List",
+          "name": "New & List",
           "slug": "app-banks-all"
-        },
-        {
-          "url": "app/ecommerce/customer/all",
-          "name": "New Bank",
-          "slug": "app-ecommerce-customer-all"
         }
       ]
     },

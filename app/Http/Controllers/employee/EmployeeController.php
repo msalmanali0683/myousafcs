@@ -1,26 +1,24 @@
 <?php
 
-namespace App\Http\Controllers\logistics;
+namespace App\Http\Controllers\employee;
 
 use App\Http\Controllers\Controller;
+use App\Models\Customer;
 use App\Models\CustomerBalance;
-use App\Models\Logistic;
+use App\Models\Employee;
+use App\Models\Labour;
 use Illuminate\Http\Request;
 
-class LogisticsController extends Controller
+class EmployeeController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $logistics = Logistic::all();
-        return view('logistics.logistics', ['logistics' => $logistics]);
-    }
 
-    public function dashboard()
-    {
-        return view('logistics.index');
+        $employes = Employee::all();
+        return view('employee.index', ['employes' => $employes]);
     }
 
     /**
@@ -38,38 +36,35 @@ class LogisticsController extends Controller
     {
         // Validate the incoming request data
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'details' => 'string|max:255',
+            'name' => 'required|string|max:255|unique:products',
         ]);
 
         try {
-            // Create a new Customer instance
             if ($request->id) {
-                $logistic =  Logistic::find($request->id);
+                // Update Customer instance
+                $expense =  Employee::find($request->id);
 
                 // Assign values from the request
-                $logistic->name = $validatedData['name'];
-                $logistic->details = $validatedData['details'];
+                $expense->name = $validatedData['name'];
 
-                // Save the logistic record
-                $logistic->save();
+                // Save the expense record
+                $expense->save();
             } else {
-                $logistic = new Logistic();
+                // Create a new Customer instance
+                $expense = new Employee();
 
                 // Assign values from the request
-                $logistic->name = $validatedData['name'];
-                $logistic->details = $validatedData['details'];
+                $expense->name = $validatedData['name'];
 
-                // Save the logistic record
-                $logistic->save();
+                // Save the expense record
+                $expense->save();
             }
 
-
             // Return a success response
-            return response()->json(['message' => 'Customer added successfully'], 201);
+            return response()->json(['message' => 'Employee added successfully'], 201);
         } catch (\Exception $e) {
             // Return an error response if something goes wrong
-            return response()->json(['message' => 'Failed to add customer', 'error' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Failed to add Employee', 'error' => $e->getMessage()], 500);
         }
     }
 
@@ -79,25 +74,26 @@ class LogisticsController extends Controller
     public function show(string $id)
     {
         $customerBalance = CustomerBalance::where('category_id', $id)
-            ->where('category', 'labour')
+            ->where('category', 'employee')
             ->get();
         $totalDebit = CustomerBalance::where('category_id', $id)
-            ->where('category', 'labour')
+            ->where('category', 'employee')
             ->where('type', 'debit')
             ->sum('amount');
         $totalCredit = CustomerBalance::where('category_id', $id)
-            ->where('category', 'labour')
+            ->where('category', 'employee')
             ->where('type', 'credit')
             ->sum('amount');
 
 
         // Retrieve customer details
-        $customer = Logistic::findOrFail($id);
+        $customer = Employee::findOrFail($id);
 
         // Pass the data to the view
-        return view('logistics.view', compact('customer', 'customerBalance', 'totalDebit', 'totalCredit'));
+        return view('employee.view', compact('customer', 'customerBalance', 'totalDebit', 'totalCredit'));
     }
 
+    
     /**
      * Show the form for editing the specified resource.
      */

@@ -52,7 +52,9 @@
                                 <tr>
                                     <td>{{ $i++ }}</td>
                                     <td class="logistic-id" hidden>{{ $logistic->id }}</td>
-                                    <td class="logistic-name">{{ $logistic->name }}</td>
+                                    <td class="logistic-name"> <a
+                                            href="{{ route('app-logistics-show', $logistic->id) }}"
+                                            class="dropdown-item">{{ $logistic->name }}</a></td>
                                     <td class="logistic-details">{{ $logistic->details }}</td>
                                     <td class="logistic-details">{{ $logistic->balance }}</td>
                                     <td>

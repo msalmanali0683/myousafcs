@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Banks;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bank;
+use App\Models\CustomerBalance;
 use Illuminate\Http\Request;
 
 class BankController extends Controller
@@ -72,7 +73,24 @@ class BankController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $customerBalance = CustomerBalance::where('account', $id)
+
+            ->get();
+        $totalDebit = CustomerBalance::where('account', $id)
+
+            ->where('type', 'debit')
+            ->sum('amount');
+        $totalCredit = CustomerBalance::where('account', $id)
+
+            ->where('type', 'credit')
+            ->sum('amount');
+
+
+        // Retrieve customer details
+        $customer = Bank::findOrFail($id);
+
+        // Pass the data to the view
+        return view('banks.view', compact('customer', 'customerBalance', 'totalDebit', 'totalCredit'));
     }
 
     /**
