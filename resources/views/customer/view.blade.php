@@ -68,7 +68,7 @@
 
                     </div>
                     <div class="col-lg-3 mt-4">
-                        <p>Available Balance : {{ $totalDebit - $totalCredit }}</p>
+                        <p>Available Balance : {{ $customer->balance }}</p>
                     </div>
                 </div>
                 <hr />
@@ -91,12 +91,25 @@
                             @foreach ($customerBalance as $item)
                                 <tr>
                                     <td>{{ $item->id }}</td>
-                                    <td>{{ $item->created_at }}</td>
+                                    <td>{{ $item->created_at->format('d-m-Y') }}</td>
                                     @if ($item->category == 'purchase_product' || $item->category == 'sale_product')
                                         <td><a href="{{ route('app-invoice-show', $item->account) }}"
                                                 data-bs-toggle="tooltip" class="text-body" data-bs-placement="top"
-                                                aria-label="Preview Invoice"
-                                                data-bs-original-title="Preview Invoice">{{ $item->details }}</a></td>
+                                                aria-label="Preview Invoice" data-bs-original-title="Preview Invoice">
+                                                @foreach ($item->product_details->product_transactions as $product_details)
+                                                    <p> <strong><small>
+
+                                                                Product: {{ $product_details->product->name }},
+                                                                Bags:{{ $product_details->bags }},
+                                                                Weight:{{ $product_details->weight }}Kg's,
+                                                                Rate: {{ $product_details->rate }}/mn
+                                                            </small>
+
+                                                        </strong>
+                                                    </p>
+                                                @endforeach
+                                                {{-- {{ $item->product_details }} --}}
+                                            </a></td>
                                     @else
                                         <td>{{ $item->details }}</td>
                                     @endif
@@ -104,13 +117,13 @@
                                         <td>{{ $item->amount }}</td>
                                         <td>0</td>
                                         @php
-                                            $balance += $item->amount;
+                                            $balance -= $item->amount;
                                         @endphp
                                     @else
                                         <td>0</td>
                                         <td>{{ $item->amount }}</td>
                                         @php
-                                            $balance -= $item->amount;
+                                            $balance += $item->amount;
                                         @endphp
                                     @endif
                                     <td>{{ $balance }}</td>
@@ -129,6 +142,12 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     $(document).ready(function() {
+        flatpickr("#endDate", {
+            dateFormat: "d-m-Y", // Set the date format to "d-m-Y" (day-month-year)
+        });
+        flatpickr("#startDate", {
+            dateFormat: "d-m-Y", // Set the date format to "d-m-Y" (day-month-year)
+        });
 
     });
 
@@ -141,6 +160,7 @@
         for (var i = 0; i < tableBody.rows.length; i++) {
             var row = tableBody.rows[i];
             var date = row.cells[1].innerText; // Assuming the date is in the second column
+            console.log(date + ', ' + startDate + ', ' + endDate);
 
             // Show/hide rows based on the date range
             if (date >= startDate && date <= endDate) {

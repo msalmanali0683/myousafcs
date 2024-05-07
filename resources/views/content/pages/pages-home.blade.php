@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bootstrap-select/bootstrap-select.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/typeahead-js/typeahead.css') }}" />
+
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/animate-css/animate.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/sweetalert2/sweetalert2.css') }}" />
 @endsection
 
 @section('page-style')
@@ -30,6 +33,7 @@
     <script src="{{ asset('assets/vendor/libs/bootstrap-select/bootstrap-select.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/typeahead-js/typeahead.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/bloodhound/bloodhound.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/sweetalert2/sweetalert2.js') }}"></script>
 @endsection
 
 @section('page-script')
@@ -39,6 +43,7 @@
     <script src="{{ asset('assets/js/forms-selects.js') }}"></script>
     <script src="{{ asset('assets/js/forms-tagify.js') }}"></script>
     <script src="{{ asset('assets/js/forms-typeahead.js') }}"></script>
+    <script src="{{ asset('assets/js/extended-ui-sweetalert2.js') }}"></script>
 @endsection
 
 @section('content')
@@ -88,15 +93,15 @@
                                 <label class="form-label" for="tyoe">Type</label>
                                 <select id="type" class="form-select">
 
-                                    <option value="debit">Cash In(Debit)</option>
-                                    <option selected value="credit">Cash Out(Credit)</option>
+                                    <option value="debit">Cash Out (Debit)</option>
+                                    <option selected value="credit">Cash in(Credit)</option>
 
                                 </select>
                             </div>
                             <div class="mb-3 col-lg-4 col-xl-4 col-12 mb-0">
                                 <label class="form-label" for="account">Accounts</label>
                                 <select id="account" class="form-select">
-
+                                    <option id="selectHereOption">Select Bank name</option>
                                     @foreach ($banks as $bank)
                                         <option value="{{ $bank->id }}">{{ $bank->name }}, {{ $bank->account }},
                                             Balance: {{ $bank->balance }}
@@ -149,7 +154,7 @@
             <div class="card">
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <div class="card-title mb-0">
-                        <h5 class="m-0 me-2">On route vehicles</h5>
+                        <h5 class="m-0 me-2">Daily Balance Sheet</h5>
                     </div>
                     <div class="dropdown">
                         <button class="btn p-0" type="button" id="routeVehicles" data-bs-toggle="dropdown"
@@ -168,7 +173,7 @@
                         <thead class="border-top">
                             <tr>
                                 <th>#</th>
-                                <th class="w-0">Transaction Type</th>
+                                <th>Transaction Type</th>
                                 <th>Category</th>
                                 <th>Name</th>
                                 <th>Account</th>
@@ -207,7 +212,8 @@
                                             href="{{ route('app-bank-show', $transaction->bank_id) }}">{{ $transaction->bank_name }}</a>
                                     </td>
                                     <td class="transaction_amount">{{ $transaction->amount }}</td>
-                                    <td class="transaction_date">{{ $transaction->created_at }}</td>
+                                    <td class="transaction_date">{{ date('d-M-Y', strtotime($transaction->created_at)) }}
+                                    </td>
                                     <td>
                                         <div class="dropdown">
                                             <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
@@ -237,10 +243,13 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     $(document).ready(function() {
+        var selectedAccountBalance = 0;
+        var enteredAmount = 0;
+        var transaction_type = $('#type').val();
         $('#newCustomerform').submit(function(event) {
             // Prevent default form submission
-            event.preventDefault();
 
+            event.preventDefault();
             // Collect form data
             var formData = {
                 '_token': $('meta[name="csrf-token"]').attr('content'),
@@ -253,43 +262,106 @@
             };
 
             console.log(formData);
+            if (validateSelectedFields(formData)) {
+                if (enteredAmount > selectedAccountBalance && transaction_type == 'debit') {
+                    console.log(selectedAccountBalance);
+                    console.log(enteredAmount);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: ' Entered amount exceeds account balance',
+                        icon: 'error',
+                        customClass: {
+                            confirmButton: 'btn btn-primary'
+                        },
+                        buttonsStyling: false
+                    });
 
-            // Send AJAX request to the server
-            $.ajax({
-                type: 'POST', // Ensure that the method is POST
-                url: '/app/transaction/save',
-                data: formData,
-                dataType: 'json',
-                success: function(data) {
-                    // Handle success response
-                    console.log('Data inserted successfully:', data);
-                    // Optionally, reset the form after successful submission
-                    $('#newCustomerform')[0].reset();
-                    window.location.href = "{{ route('pages-home') }}";
-                },
-                error: function(xhr, status, error) {
-                    // Handle error response
-                    console.log('Error:', xhr.responseText);
+                } else {
+
+                    // If all selected fields are filled, submit the form
+                    $.ajax({
+                        type: 'POST', // Ensure that the method is POST
+                        url: '/app/transaction/save',
+                        data: formData,
+                        dataType: 'json',
+                        success: function(data) {
+                            // Handle success response
+                            console.log('Data inserted successfully:', data);
+                            // Optionally, reset the form after successful submission
+                            $('#newCustomerform')[0].reset();
+                            window.location.href = "{{ route('pages-home') }}";
+                        },
+                        error: function(xhr, status, error) {
+                            // Handle error response
+                            console.log('Error:', xhr.responseText);
+                        }
+                    });
                 }
-            });
-        });
-        document.getElementById('amount').addEventListener('input', function() {
-            var selectedAccountId = document.getElementById('account').value;
-            var selectedAccountBalance = parseFloat(document.querySelector(
-                `#account option[value="${selectedAccountId}"]`).getAttribute('data-balance'));
-            var enteredAmount = parseFloat(this.value);
-            console.log(enteredAmount);
-            console.log(selectedAccountBalance);
-            if (enteredAmount > selectedAccountBalance) {
-                console.log('error');
             } else {
-                console.log('error no');
+                // If any selected field is null or empty, show error message
+                Swal.fire({
+                    title: 'Error!',
+                    text: ' Please fill in all selected fields',
+                    icon: 'error',
+                    customClass: {
+                        confirmButton: 'btn btn-primary'
+                    },
+                    buttonsStyling: false
+                });
+
+            }
+            // Send AJAX request to the server
+
+        });
+
+
+
+        // Event listener for the account select element
+        document.getElementById('account').addEventListener('change', function() {
+            // Get the selected account balance
+            var selectedIndex = this.selectedIndex;
+            selectedAccountBalance = parseFloat(this.options[selectedIndex].innerText.split(
+                'Balance: ')[1]);
+        });
+
+
+
+        document.getElementById('type').addEventListener('input', function() {
+            transaction_type = this.value;
+
+        });
+
+        document.getElementById('amount').addEventListener('input', function() {
+            enteredAmount = parseFloat(this.value);
+
+            if (enteredAmount > selectedAccountBalance && transaction_type == 'debit') {
+                Swal.fire({
+                    title: 'Error!',
+                    text: ' Entered amount exceeds account balance',
+                    icon: 'error',
+                    customClass: {
+                        confirmButton: 'btn btn-primary'
+                    },
+                    buttonsStyling: false
+                });
 
             }
         });
     });
 
 
+
+    function validateSelectedFields(formData) {
+        var fieldsToCheck = ['type', 'category', 'category_id', 'account', 'amount'];
+
+        for (var i = 0; i < fieldsToCheck.length; i++) {
+            var field = fieldsToCheck[i];
+            if (!formData[field] || formData[field].trim() === '') {
+                return false; // Return false if any field is null or empty
+            }
+        }
+        return true; // Return true if all selected fields are filled
+    }
 
     function populateOptions() {
         var category = document.getElementById('category').value;

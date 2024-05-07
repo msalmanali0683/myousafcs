@@ -15,4 +15,14 @@ class ProductTransaction extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function logistic(): BelongsTo
+    {
+        return $this->belongsTo(Logistic::class);
+    }
+
+    public function invoice(): BelongsTo
+    {
+        return $this->belongsTo(Invoice::class);
+    }
 }

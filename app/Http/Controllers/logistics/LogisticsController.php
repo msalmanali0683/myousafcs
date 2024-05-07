@@ -5,7 +5,9 @@ namespace App\Http\Controllers\logistics;
 use App\Http\Controllers\Controller;
 use App\Models\CustomerBalance;
 use App\Models\Logistic;
+use App\Models\ProductTransaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class LogisticsController extends Controller
 {
@@ -78,24 +80,38 @@ class LogisticsController extends Controller
      */
     public function show(string $id)
     {
-        $customerBalance = CustomerBalance::where('category_id', $id)
-            ->where('category', 'labour')
+        $logisticBalance = CustomerBalance::where('category_id', $id)
+            ->where('category', 'logistics')
+            ->orderBy('id', 'desc') // Order by ID from high to low
             ->get();
-        $totalDebit = CustomerBalance::where('category_id', $id)
-            ->where('category', 'labour')
-            ->where('type', 'debit')
-            ->sum('amount');
-        $totalCredit = CustomerBalance::where('category_id', $id)
-            ->where('category', 'labour')
-            ->where('type', 'credit')
-            ->sum('amount');
+
+        // Retrieve product transactions where logistic_id is $id
+        $productTransactions = ProductTransaction::where('logistic_id', $id)
+            ->orderBy('id', 'desc') // Order by ID from high to low
+            ->get();
+
+        $logistics = [];
+
+        // Add logistic balance items to the logistics array
+        foreach ($logisticBalance as $item) {
+            $item->invoice_type = 'logistic';
+            $logistics[] = $item;
+        }
+
+        // Add product transactions to the logistics array
+        foreach ($productTransactions as $item) {
+            $item->amount = $item->logistic_amount ?? 0;
+            $item->type = ($item->invoice_type == 'purchase') ? 'credit' : 'debit';
+            $logistics[] = $item;
+        }
+
 
 
         // Retrieve customer details
-        $customer = Logistic::findOrFail($id);
+        $logistic = Logistic::findOrFail($id);
 
         // Pass the data to the view
-        return view('logistics.view', compact('customer', 'customerBalance', 'totalDebit', 'totalCredit'));
+        return view('logistics.view', compact('logistic', 'logistics'));
     }
 
     /**
@@ -109,9 +125,47 @@ class LogisticsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'transactionId' => 'required|exists:product_transactions,id',
+            'amount' => 'required|numeric|min:0',
+        ]);
+
+        // If validation fails, return error response
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ]);
+        }
+
+        // Retrieve the transaction ID and amount from the request
+        $transactionId = $request->input('transactionId');
+        $amount = $request->input('amount');
+
+        // Update the logistic amount
+        try {
+            $transaction = ProductTransaction::findOrFail($transactionId);
+            $transaction->logistic_amount = $amount;
+
+            $oldBlance = Logistic::find($transaction->logistic_id);
+            $oldBlance->balance = $oldBlance->balance + $amount;
+
+            $transaction->save();
+            $oldBlance->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Amount updated successfully',
+            ]);
+        } catch (\Exception $e) {
+            // Return error response if an exception occurs
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update amount',
+            ]);
+        }
     }
 
     /**

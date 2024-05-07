@@ -19,6 +19,11 @@ return new class extends Migration
             $table->enum('invoice_type', ['sale', 'purchase']);
             $table->foreignId('product_id')->constrained()->onDelete('cascade'); // Define foreign key
             $table->foreignId('invoice_id')->constrained()->onDelete('cascade'); // Define foreign key
+            $table->foreignId('logistic_id')->constrained()->onDelete('cascade');
+            $table->foreignId('labour_id')->constrained()->onDelete('cascade'); // Define foreign key
+            $table->double('labour_amount')->nullable();
+            $table->double('logistic_amount')->nullable();
+            $table->string('driver_name')->nullable();
             $table->timestamps();
         });
     }

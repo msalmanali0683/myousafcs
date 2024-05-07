@@ -40,6 +40,7 @@
                                 <th>#</th>
                                 <th>Name</th>
                                 <th>Account Number</th>
+                                <th>Balance</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -53,6 +54,7 @@
                                     <td class="bank-id" hidden>{{ $bank->id }}</td>
                                     <td class="bank-name">{{ $bank->name }}</td>
                                     <td class="bank-account">{{ $bank->account }}</td>
+                                    <td class="bank-account">{{ $bank->balance }}</td>
                                     <td>
                                         <div class="dropdown">
                                             <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
@@ -95,6 +97,11 @@
                                         <input type="text" id="account" class="form-control"
                                             placeholder="Enter account number ...." required>
                                     </div>
+                                    <div class="mb-3 col-12">
+                                        <label class="form-label" for="balance">Opening Balance</label>
+                                        <input type="text" id="balance" class="form-control"
+                                            placeholder="Enter opening balance ...." required value="0">
+                                    </div>
                                     <div class="col-8 offset-4">
                                         <button class="btn btn-primary waves-effect waves-light" data-repeater-create="">
                                             Save
@@ -136,6 +143,7 @@
                     '_token': $('meta[name="csrf-token"]').attr('content'),
                     'name': $('#name').val(),
                     'account': $('#account').val(),
+                    'balance': $('#balance').val(),
                     'id': editbankID
                 };
 

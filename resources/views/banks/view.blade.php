@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Employee View')
+@section('title', 'Bank View')
 
 @section('vendor-style')
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/apex-charts/apex-charts.css') }}" />
@@ -37,7 +37,7 @@
 
 @section('content')
     <h4 class="py-3 mb-4">
-        <span class="text-muted fw-light">Customer View </span>
+        <span class="text-muted fw-light">Bank Details </span>
         <span><strong>{{ $customer->name }}</strong></span>
 
     </h4>
@@ -66,7 +66,8 @@
 
                     </div>
                     <div class="col-lg-3 mt-4">
-                        <p>Available Balance : {{ $totalDebit - $totalCredit }}</p>
+                        <p>Available Balance : {{ $customer->balance }}</p>
+                        {{-- <p>Available Balance : {{ $totalCredit - $totalDebit }}</p> --}}
                     </div>
                 </div>
                 <hr />
@@ -84,12 +85,12 @@
                         </thead>
                         <tbody id="balanceTableBody">
                             @php
-                                $balance = 0;
+                                $balance = $customer->balance;
                             @endphp
                             @foreach ($customerBalance as $item)
                                 <tr>
                                     <td>{{ $item->id }}</td>
-                                    <td>{{ $item->created_at }}</td>
+                                    <td>{{ date('d-M-Y', strtotime($item->created_at)) }}</td>
                                     @if ($item->category == 'purchase_product' || $item->category == 'sale_product')
                                         <td><a href="{{ route('app-invoice-show', $item->account) }}"
                                                 data-bs-toggle="tooltip" class="text-body" data-bs-placement="top"
@@ -101,17 +102,18 @@
                                     @if ($item->type == 'debit')
                                         <td>{{ $item->amount }}</td>
                                         <td>0</td>
+                                        <td>{{ $balance }}</td>
                                         @php
                                             $balance += $item->amount;
                                         @endphp
                                     @else
                                         <td>0</td>
                                         <td>{{ $item->amount }}</td>
+                                        <td>{{ $balance }}</td>
                                         @php
                                             $balance -= $item->amount;
                                         @endphp
                                     @endif
-                                    <td>{{ $balance }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -127,18 +129,24 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     $(document).ready(function() {
-
+        flatpickr("#endDate", {
+            dateFormat: "d-M-Y", // Set the date format to "d-m-Y" (day-month-year)
+        });
+        flatpickr("#startDate", {
+            dateFormat: "d-M-Y", // Set the date format to "d-m-Y" (day-month-year)
+        });
     });
 
     function filterData() {
-        var startDate = document.getElementById("startDate").value;
-        var endDate = document.getElementById("endDate").value;
+        var startDate = new Date(document.getElementById("startDate").value);
+        var endDate = new Date(document.getElementById("endDate").value);
         var tableBody = document.getElementById("balanceTableBody");
 
         // Loop through each row in the table body
         for (var i = 0; i < tableBody.rows.length; i++) {
             var row = tableBody.rows[i];
-            var date = row.cells[1].innerText; // Assuming the date is in the second column
+            var dateString = row.cells[1].innerText; // Assuming the date is in the second column
+            var date = new Date(dateString);
 
             // Show/hide rows based on the date range
             if (date >= startDate && date <= endDate) {

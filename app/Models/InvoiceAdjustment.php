@@ -13,6 +13,6 @@ class InvoiceAdjustment extends Model
 
     public function invoice(): BelongsTo
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Invoice::class);
     }
 }

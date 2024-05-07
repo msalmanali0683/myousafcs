@@ -5,7 +5,9 @@ namespace App\Http\Controllers\labour;
 use App\Http\Controllers\Controller;
 use App\Models\CustomerBalance;
 use App\Models\Labour;
+use App\Models\ProductTransaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class LabourController extends Controller
 {
@@ -71,24 +73,42 @@ class LabourController extends Controller
      */
     public function show(string $id)
     {
-        $customerBalance = CustomerBalance::where('category_id', $id)
+        // Fetch customer balances
+        $logisticBalance = CustomerBalance::where('category_id', $id)
             ->where('category', 'labour')
+            ->orderBy('id', 'desc') // Order by ID from high to low
             ->get();
-        $totalDebit = CustomerBalance::where('category_id', $id)
-            ->where('category', 'labour')
-            ->where('type', 'debit')
-            ->sum('amount');
-        $totalCredit = CustomerBalance::where('category_id', $id)
-            ->where('category', 'labour')
-            ->where('type', 'credit')
-            ->sum('amount');
+
+        // Retrieve product transactions where logistic_id is $id
+        $productTransactions = ProductTransaction::where('labour_id', $id)
+            ->orderBy('id', 'desc') // Order by ID from high to low
+            ->get();
+
+        $logistics = [];
+
+        // Add logistic balance items to the logistics array
+        foreach ($logisticBalance as $item) {
+            $item->invoice_type = 'labour';
+            $logistics[] = $item;
+        }
+
+        // Add product transactions to the logistics array
+        foreach ($productTransactions as $item) {
+            $item->amount = $item->labour_amount ?? 0;
+            $item->type = ($item->invoice_type == 'purchase') ? 'credit' : 'debit';
+            $logistics[] = $item;
+        }
+
 
 
         // Retrieve customer details
-        $customer = Labour::findOrFail($id);
+        $logistic = Labour::findOrFail($id);
 
         // Pass the data to the view
-        return view('labour.view', compact('customer', 'customerBalance', 'totalDebit', 'totalCredit'));
+        return view('labour.view', compact('logistic', 'logistics'));
+
+        // Pass the data to the view
+
     }
 
     /**
@@ -102,9 +122,47 @@ class LabourController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'transactionId' => 'required|exists:product_transactions,id',
+            'amount' => 'required|numeric|min:0',
+        ]);
+
+        // If validation fails, return error response
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ]);
+        }
+
+        // Retrieve the transaction ID and amount from the request
+        $transactionId = $request->input('transactionId');
+        $amount = $request->input('amount');
+
+        // Update the logistic amount
+        try {
+            $transaction = ProductTransaction::findOrFail($transactionId);
+            $transaction->labour_amount = $amount;
+
+            $oldBlance = Labour::find($transaction->logistic_id);
+            $oldBlance->balance = $oldBlance->balance + $amount;
+
+            $transaction->save();
+            $oldBlance->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Amount updated successfully',
+            ]);
+        } catch (\Exception $e) {
+            // Return error response if an exception occurs
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update amount',
+            ]);
+        }
     }
 
     /**

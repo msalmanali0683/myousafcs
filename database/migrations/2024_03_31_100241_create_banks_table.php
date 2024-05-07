@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name')->nullable();
             $table->string('account')->nullable();
-            $table->integer('balance')->nullable();
+            $table->integer('balance')->default(0);
             $table->timestamps();
         });
     }

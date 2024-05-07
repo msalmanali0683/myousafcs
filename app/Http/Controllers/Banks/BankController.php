@@ -35,6 +35,7 @@ class BankController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'account' => 'required|string|max:255',
+            'balance'  => 'required',
         ]);
 
         try {
@@ -54,6 +55,7 @@ class BankController extends Controller
                 // Assign values from the request
                 $bank->name = $validatedData['name'];
                 $bank->account = $validatedData['account'];
+                $bank->balance = $validatedData['balance'];
 
                 // Save the bank record
                 $bank->save();
@@ -75,7 +77,7 @@ class BankController extends Controller
     {
         $customerBalance = CustomerBalance::where('account', $id)
 
-            ->get();
+            ->latest()->get();
         $totalDebit = CustomerBalance::where('account', $id)
 
             ->where('type', 'debit')

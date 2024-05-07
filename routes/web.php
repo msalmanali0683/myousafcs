@@ -97,12 +97,15 @@ Route::get('/app/logistics/create', [LogisticsController::class, 'index'])->name
 Route::post('/app/logistics/store', [LogisticsController::class, 'store'])->name('app-logistics-store');
 Route::get('/app/logistics/show/{id}', [LogisticsController::class, 'show'])->name('app-logistics-show');
 
+Route::post('/app/logistics/update_balance', [LogisticsController::class, 'update'])->name('app-logistics-update-balance');
+
 Route::get('/app/banks/all', [BankController::class, 'index'])->name('app-banks-all');
 Route::post('/app/banks/store', [BankController::class, 'store'])->name('app-banks-store');
 Route::get('/app/bank/show/{id}', [BankController::class, 'show'])->name('app-bank-show');
 
 Route::get('/app/employee/labour', [LabourController::class, 'index'])->name('app-employee-labour');
 Route::post('/app/labour/store', [LabourController::class, 'store'])->name('app-labour-store');
+Route::post('/app/labour/update_balance', [LabourController::class, 'update'])->name('app-labour-update-balance');
 Route::get('/app/employee/labour/show/{id}', [LabourController::class, 'show'])->name('app-employee-labour-show');
 
 Route::get('/app/employee/employee', [EmployeeController::class, 'index'])->name('app-employee-employee');

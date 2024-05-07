@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'eCommerce Product List - Apps')
+@section('title', 'eCommerce Logistics List - Apps')
 
 @section('vendor-style')
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
@@ -52,8 +52,7 @@
                                 <tr>
                                     <td>{{ $i++ }}</td>
                                     <td class="logistic-id" hidden>{{ $logistic->id }}</td>
-                                    <td class="logistic-name"> <a
-                                            href="{{ route('app-logistics-show', $logistic->id) }}"
+                                    <td class="logistic-name"> <a href="{{ route('app-logistics-show', $logistic->id) }}"
                                             class="dropdown-item">{{ $logistic->name }}</a></td>
                                     <td class="logistic-details">{{ $logistic->details }}</td>
                                     <td class="logistic-details">{{ $logistic->balance }}</td>

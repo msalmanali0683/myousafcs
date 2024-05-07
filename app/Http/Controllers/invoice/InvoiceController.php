@@ -50,8 +50,7 @@ class InvoiceController extends Controller
     public function store(Request $request)
     {
         try {
-            $logisticData = $request->input('logistic');
-            $labourData = $request->input('labour');
+
             $invocie_details = $request->input('user');
             $adjustmentDetailsData = $request->input('adjustmentDetailsFormData');
             $productDetailsData = $request->input('productDetailsFormData');
@@ -89,6 +88,9 @@ class InvoiceController extends Controller
                     'rate' => $productDetail['rate'],
                     'invoice_type' => $request['invoice_type'],
                     'product_id' => $productDetail['product'],
+                    'logistic_id' => $productDetail['logistic_id'],
+                    'driver_name' => $productDetail['driver_name'],
+                    'labour_id' => $productDetail['labour_id'],
                     'invoice_id' => $invoice->id,
                 ]);
 
@@ -98,35 +100,11 @@ class InvoiceController extends Controller
                 $product->qty = $newQty;
                 $product->save();
             }
-            if ($logisticData['logistic_type'] == 'own') {
-                $logistic = InvoiceLogistics::create([
-                    'invoice_id' => $invoice->id,
-                    'logistic_id' => $logisticData['logistic_account'],
-                    'amount' => $logisticData['logistic_amount'],
-                    'driver_name' => $logisticData['logistic_driver'],
-                ]);
 
-                $logistic = Logistic::find($logisticData['logistic_account']);
-                $newQty = $logistic->balance + floatval($logisticData['logistic_amount']);
-                $logistic->balance = $newQty;
-                $logistic->save();
-            }
-            if ($labourData['labour_type'] == 'own') {
-                $labour = InvoiceLabour::create([
-                    'invoice_id' => $invoice->id,
-                    'labour_id' => $labourData['labour_account'],
-                    'amount' => $labourData['labour_amount'],
 
-                ]);
-
-                $labour = Labour::find($labourData['labour_account']);
-                $newQty = $labour->balance + floatval($labourData['labour_amount']);
-                $labour->balance = $newQty;
-                $labour->save();
-            }
             if ($request['invoice_type'] == 'purchase') {
                 CustomerBalance::create([
-                    'type' => 'debit',
+                    'type' => 'credit',
                     'category' => 'purchase_product',
                     'amount' =>  $invocie_details['grand_amount'],
                     'details' => 'Purchase product',
@@ -135,9 +113,13 @@ class InvoiceController extends Controller
                     'user_id' => 1,
 
                 ]);
+                $oldBlance = Customer::find($invocie_details['customer_id']);
+                $balance = $oldBlance->balance + $invocie_details['grand_amount'];
+                $oldBlance->balance = $balance;
+                $oldBlance->save();
             } else {
                 CustomerBalance::create([
-                    'type' => 'credit',
+                    'type' => 'debit',
                     'category' => 'sale_product',
                     'amount' =>  $invocie_details['grand_amount'],
                     'details' => 'Sale product',
@@ -146,7 +128,12 @@ class InvoiceController extends Controller
                     'user_id' => 1,
 
                 ]);
+                $oldBlance = Customer::find($invocie_details['customer_id']);
+                $balance = $oldBlance->balance + $invocie_details['grand_amount'];
+                $oldBlance->balance = $balance;
+                $oldBlance->save();
             }
+
             return response()->json(['message' => 'Invoice added successfully', 'invoice_id' => $invoice->id], 201);
         } catch (\Exception $e) {
             // Return an error response if something goes wrong
@@ -242,18 +229,19 @@ class InvoiceController extends Controller
             ]);
             $bank = Bank::find($request['account']);
             if ($request['type'] == 'debit') {
-                $bank->balance = $bank->balance +  $request['amount'];
-            } else {
                 $bank->balance = $bank->balance -  $request['amount'];
+            } else {
+                $bank->balance = $bank->balance +  $request['amount'];
             }
+            $bank->save();
 
             if ($request['category'] == 'customer') {
                 $oldBlance = Customer::find($request['category_id']);
                 if ($request['type'] == 'debit') {
-                    $balance = $oldBlance->balance + $request['amount'];
+                    $balance = $oldBlance->balance - $request['amount'];
                     $oldBlance->balance = $balance;
                 } else {
-                    $balance = $oldBlance->balance - $request['amount'];
+                    $balance = $oldBlance->balance + $request['amount'];
 
                     $oldBlance->balance = $balance;
                 }
@@ -261,10 +249,10 @@ class InvoiceController extends Controller
             } else if ($request['category'] == 'employee') {
                 $oldBlance = Employee::find($request['category_id']);
                 if ($request['type'] == 'debit') {
-                    $balance = $oldBlance->balance + $request['amount'];
+                    $balance = $oldBlance->balance - $request['amount'];
                     $oldBlance->balance = $balance;
                 } else {
-                    $balance = $oldBlance->balance - $request['amount'];
+                    $balance = $oldBlance->balance + $request['amount'];
 
                     $oldBlance->balance = $balance;
                 }
@@ -272,10 +260,10 @@ class InvoiceController extends Controller
             } else if ($request['category'] == 'expense') {
                 $oldBlance = Expense::find($request['category_id']);
                 if ($request['type'] == 'debit') {
-                    $balance = $oldBlance->balance + $request['amount'];
+                    $balance = $oldBlance->balance - $request['amount'];
                     $oldBlance->balance = $balance;
                 } else {
-                    $balance = $oldBlance->balance - $request['amount'];
+                    $balance = $oldBlance->balance + $request['amount'];
 
                     $oldBlance->balance = $balance;
                 }
@@ -283,10 +271,10 @@ class InvoiceController extends Controller
             } else if ($request['category'] == 'logistics') {
                 $oldBlance = Logistic::find($request['category_id']);
                 if ($request['type'] == 'debit') {
-                    $balance = $oldBlance->balance + $request['amount'];
+                    $balance = $oldBlance->balance - $request['amount'];
                     $oldBlance->balance = $balance;
                 } else {
-                    $balance = $oldBlance->balance - $request['amount'];
+                    $balance = $oldBlance->balance + $request['amount'];
 
                     $oldBlance->balance = $balance;
                 }
@@ -294,18 +282,15 @@ class InvoiceController extends Controller
             } else if ($request['category'] == 'labour') {
                 $oldBlance = Labour::find($request['category_id']);
                 if ($request['type'] == 'debit') {
-                    $balance = $oldBlance->balance + $request['amount'];
+                    $balance = $oldBlance->balance - $request['amount'];
                     $oldBlance->balance = $balance;
                 } else {
-                    $balance = $oldBlance->balance - $request['amount'];
+                    $balance = $oldBlance->balance + $request['amount'];
 
                     $oldBlance->balance = $balance;
                 }
                 $oldBlance->save();
             }
-
-
-
 
             return response()->json(['message' => 'Transaction completed successfully'], 201);
         } catch (\Exception $e) {

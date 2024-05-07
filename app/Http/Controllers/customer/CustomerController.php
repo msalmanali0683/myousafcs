@@ -5,6 +5,8 @@ namespace App\Http\Controllers\customer;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\CustomerBalance;
+use App\Models\Invoice;
+use App\Models\ProductTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -37,6 +39,7 @@ class CustomerController extends Controller
             'name' => 'required|string|max:255',
             'contact_number' => 'required|string|max:15',
             'address' => 'required|string|max:255',
+            'opening_balance' => 'integer',
         ]);
 
         try {
@@ -46,6 +49,7 @@ class CustomerController extends Controller
             // Assign values from the request
             $customer->name = $validatedData['name'];
             $customer->contact = $validatedData['contact_number'];
+            $customer->balance = $validatedData['opening_balance'] ?? 0;
             $customer->address = $validatedData['address'];
 
             // Save the customer record
@@ -81,6 +85,17 @@ class CustomerController extends Controller
                     });
             })
             ->get();
+        foreach ($customerBalance as $transaction) {
+            if ($transaction->category == 'purchase_product' || $transaction->category == 'purchase_product') {
+                $product_details = Invoice::where('id', $transaction->account)->with('product_transactions', 'product_transactions.product')->first();
+
+
+                $transaction->product_details = $product_details;
+            } else {
+                $transaction->product_details = [];
+            }
+        }
+        // dd($customerBalance);
         $totalDebit = CustomerBalance::where('category_id', $id)
             ->where(function ($query) use ($id) {
                 $query->where('category', 'purchase_product')

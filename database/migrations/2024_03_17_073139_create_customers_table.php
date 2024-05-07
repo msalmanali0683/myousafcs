@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('contact')->nullable();
             $table->string('address')->nullable();
             $table->double('balance')->default(0.0);
+            $table->double('opening_balance')->default(0.0);
             $table->timestamps();
         });
     }

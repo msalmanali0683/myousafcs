@@ -93,15 +93,20 @@
                                     <hr class="mt-0" />
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-5">
                                     <label class="form-label" for="formValidationName">Full Name</label>
                                     <input type="text" id="formValidationName" class="form-control"
                                         placeholder="Enter full name........." name="formValidationName" required />
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-5">
                                     <label class="form-label" for="contact_number">Contact Number</label>
                                     <input type="text" id="contact_number" class="form-control"
                                         placeholder="Enter Mobile number ..............." name="contact_number" required />
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label" for="opening_balance">Opening Balance</label>
+                                    <input type="number" id="opening_balance" class="form-control" placeholder="0"
+                                        name="opening_balance" />
                                 </div>
                                 <div class="col-md-12">
                                     <label class="form-label" for="address">Address</label>
@@ -153,7 +158,9 @@
                                     <dd class="col-sm-6 d-flex justify-content-md-end pe-0 ps-0 ps-sm-2">
                                         <div class="input-group input-group-merge disabled w-px-150">
                                             <span class="input-group-text">#</span>
-                                            <input type="text" class="form-control" disabled value="{{ isset($invoice) && $invoice->id ? $invoice->id + 1 : 1 }}" id="invoiceId" />
+                                            <input type="text" class="form-control" disabled
+                                                value="{{ isset($invoice) && $invoice->id ? $invoice->id + 1 : 1 }}"
+                                                id="invoiceId" />
 
 
                                         </div>
@@ -189,37 +196,67 @@
                                                             @endforeach
                                                         </select>
                                                     </div>
-                                                    <div class="mb-3 col-lg-6 col-xl-2 col-12 mb-0">
+                                                    <div class="mb-3 col-lg-2 col-xl-2 col-12 mb-0">
                                                         <label class="form-label" for="bags">Bags</label>
                                                         <input type="number" id="bags" class="form-control"
                                                             placeholder="0" required />
                                                     </div>
-                                                    <div class="mb-3 col-lg-6 col-xl-2 col-12 mb-0">
+                                                    <div class="mb-3 col-lg-2 col-xl-2 col-12 mb-0">
                                                         <label class="form-label" for="weight">Total Weight in
                                                             KG</label>
                                                         <input type="number" id="weight" class="form-control"
                                                             placeholder="0" required />
                                                     </div>
-                                                    <div class="mb-3 col-lg-4 col-xl-2 col-12 mb-0">
-                                                        <label class="form-label" for="weight_mn">Weight in MN</label>
+                                                    <div class="mb-3 col-lg-1 col-xl-1 col-12 mb-0">
+                                                        <label class="form-label" for="weight_mn">Weight MN</label>
                                                         <input type="number" id="weight_mn" class="form-control"
                                                             placeholder="0" required disabled />
                                                     </div>
-                                                    <div class="mb-3 col-lg-4 col-xl-2 col-12 mb-0">
-                                                        <label class="form-label" for="weight_mn">Weight in Kg</label>
+                                                    <div class="mb-3 col-lg-1 col-xl-1 col-12 mb-0">
+                                                        <label class="form-label" for="weight_kg">Weight Kg</label>
                                                         <input type="number" id="weight_kg" class="form-control"
                                                             placeholder="0" required disabled />
                                                     </div>
-                                                    <div class="mb-3 col-lg-4 col-xl-2 col-12 mb-0">
+                                                    <div class="mb-3 col-lg-2 col-xl-2 col-12 mb-0">
                                                         <label class="form-label" for="rate">Rate</label>
                                                         <input type="number" id="rate" class="form-control"
                                                             placeholder="0" required />
                                                     </div>
-                                                    <div class="mb-3 col-lg-4 col-xl-2 col-12 mb-0">
+                                                    <div class="mb-3 col-lg-2 col-xl-2 col-12 mb-0">
                                                         <label class="form-label" for="total_amount">Total
                                                             Amount</label>
                                                         <input type="number" id="total_amount" class="form-control"
                                                             placeholder="0" />
+                                                    </div>
+                                                    <div class="col-lg-3 col-xl-2 col-12">
+                                                        <label for="logistic_account" class="form-label">Vehicle
+                                                            Number</label>
+                                                        <select id="logistic_account" class="form-select"
+                                                            data-allow-clear="true">
+                                                            @foreach ($logistics as $logistic)
+                                                                <option value="{{ $logistic->id }}">{{ $logistic->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 ">
+                                                        <label for="logistic_driver" class="form-label">Driver
+                                                            Name</label>
+                                                        <input class="form-control" placeholder="Enter  Driver name..."
+                                                            type="text" value="" tabindex="0"
+                                                            id="logistic_driver">
+
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label for="labour_account" class="form-label">Labour
+                                                            Account</label>
+                                                        <select id="labour_account" class="form-select"
+                                                            data-allow-clear="true">
+                                                            @foreach ($labours as $labour)
+                                                                <option value="{{ $labour->id }}">{{ $labour->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
                                                     </div>
 
                                                     <div
@@ -287,74 +324,8 @@
                                         <hr class="my-3 mx-n4" />
 
                                         <div class="row p-0 p-sm-4">
-                                            <div class="col-md-10 mb-md-0 mb-3">
-                                                <div class="row p-0 p-sm-4">
-                                                    <div class="mb-3 col-lg-2 col-xl-2 col-12 mb-0">
-                                                        <label class="form-label" for="labour_type">Labour Type
-                                                            Type</label>
-                                                        <select id="labour_type" class="form-select">
-                                                            <option value="own">Own</option>
-                                                            <option value="client">Client</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-5 mb-5">
-                                                        <label for="selectpickerLabourAccount" class="form-label">Labour
-                                                            Account</label>
-                                                        <select id="labour_account"
-                                                            class="select2 form-select form-select-lg"
-                                                            data-allow-clear="true">
-                                                            @foreach ($labours as $labour)
-                                                                <option value="{{ $labour->id }}">{{ $labour->name }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-sm-5 mb-5">
-                                                        <label for="labour_amount" class="form-label">Labour
-                                                            Amount</label>
-                                                        <input class="form-control"
-                                                            placeholder="Enter  Amount Give to  labour..." type="text"
-                                                            value="" tabindex="0" id="labour_amount">
 
-                                                    </div>
-                                                    <div class="mb-3 col-lg-2 col-xl-2 col-12 mb-0">
-                                                        <label class="form-label" for="logistic_type">Logistic
-                                                            Type</label>
-                                                        <select id="logistic_type" class="form-select">
-                                                            <option value="own">Own</option>
-                                                            <option value="client">Client</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-4 mb-4">
-                                                        <label for="logistic_account" class="form-label">Vehicle
-                                                            Number</label>
-                                                        <select id="logistic_account"
-                                                            class="select2 form-select form-select-lg"
-                                                            data-allow-clear="true">
-                                                            @foreach ($logistics as $logistic)
-                                                                <option value="{{ $logistic->id }}">{{ $logistic->name }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-sm-3 mb-4">
-                                                        <label for="logistic_driver" class="form-label">Driver
-                                                            Name</label>
-                                                        <input class="form-control" placeholder="Enter  Driver name..."
-                                                            type="text" value="" tabindex="0"
-                                                            id="logistic_driver">
-
-                                                    </div>
-                                                    <div class="col-sm-3 mb-4">
-                                                        <label for="logistic_amount" class="form-label">Amount</label>
-                                                        <input class="form-control" placeholder="Enter  Amount..."
-                                                            type="number" value="" tabindex="0"
-                                                            id="logistic_amount">
-
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-2 d-flex justify-content-end">
+                                            <div class="col-md-2  offset-10 d-flex justify-content-end">
                                                 <div class="invoice-calculations">
                                                     {{-- <div class="d-flex justify-content-between mb-2">
                                                         <span class="w-px-100">Subtotal:</span>
@@ -412,23 +383,6 @@
 
         // Set the value of the input field to today's date
         document.getElementById('date').value = today;
-        $('#labourcategory').change(function() {
-            // Get the selected value
-            var labourAccountSelect = document.getElementById('labourAccountSelectBox');
-            var selectedValue = $(this).val();
-            if (selectedValue === 'Self') {
-                console.log(selectedValue);
-                $("#labourAccountSelectBox").css("display", "block");
-                $("#labour_block").css("display", "block");
-
-            } else {
-                $("#labourAccountSelectBox").css("display", "none");
-                $("#labour_block").css("display", "none");
-
-
-            }
-
-        });
 
         // Trigger the change event on page load to handle initial state
         $('#selectpickerBasic').change();
@@ -442,7 +396,9 @@
                 '_token': $('meta[name="csrf-token"]').attr('content'),
                 'name': $('#formValidationName').val(),
                 'contact_number': $('#contact_number').val(),
-                'address': $('#address').val()
+                'address': $('#address').val(),
+                'opening_balance': $('#opening_balance').val() !== '' ? $('#opening_balance')
+                    .val() : 0
             };
 
             console.log(formData);
@@ -480,6 +436,9 @@
                 var weight = $(this).find('#weight').val();
                 var rate = $(this).find('#rate').val();
                 var totalAmount = $(this).find('#total_amount').val();
+                var logistic_id = $(this).find('#labour_account').val();
+                var driver_name = $(this).find('#logistic_driver').val();
+                var labour_id = $(this).find('#labour_account').val();
 
                 // Create an object with the collected data
                 var productDetail = {
@@ -487,7 +446,10 @@
                     'bags': bags,
                     'weight': weight,
                     'rate': rate,
-                    'totalAmount': totalAmount
+                    'totalAmount': totalAmount,
+                    'logistic_id': logistic_id,
+                    'driver_name': driver_name,
+                    'labour_id': labour_id,
                 };
 
                 // Push the object into the array
@@ -512,23 +474,6 @@
                 // Push the object into the array
                 adjustmentDetailsFormData.push(adjustmentDetail);
             });
-            console.log(adjustmentDetailsFormData);
-
-            var labour = {
-                'labour_type': $('#labour_type').val(),
-                'labour_account': $('#labour_account').val(),
-                'labour_amount': $('#labour_amount').val(),
-            };
-
-            var logistic = {
-                'logistic_type': $('#logistic_type').val(),
-                'logistic_account': $('#logistic_account').val(),
-                'logistic_driver': $('#logistic_driver').val(),
-                'logistic_amount': $('#logistic_amount').val(),
-            };
-
-            formData.logistic = logistic;
-            formData.labour = labour;
             formData.adjustmentDetailsFormData = adjustmentDetailsFormData;
             formData.productDetailsFormData = productDetailsFormData;
             formData.user = {
@@ -629,10 +574,10 @@
             var rate = parseFloat($form.find('#rate').val()) || 0;
 
             // Update the calculated values within the specific form
-            $form.find('#weight_mn').val((weight / 40).toFixed(0));
+            $form.find('#weight_mn').val(parseInt(weight / 40));
             $form.find('#weight_kg').val((weight % 40).toFixed(0));
 
-            var totalAmount = weight * (rate/40);
+            var totalAmount = weight * (rate / 40);
             $form.find('#total_amount').val(totalAmount.toFixed(2));
 
             // Calculate and update the grand total
@@ -643,30 +588,6 @@
         // Trigger initial calculation
         calculateGrandTotal();
 
-        $('#labour_type').change(function() {
-            var selectedValue = $(this).val();
-            if (selectedValue === 'own') {
-                // If Labour Type is "Own", make Labour Account and Labour Amount fields required
-                $('#labour_account, #labour_amount').prop('disabled', false).prop('required', true);
-            } else if (selectedValue === 'client') {
-                // If Labour Type is "Client", disable Labour Account and Labour Amount fields
-                $('#labour_account, #labour_amount').prop('disabled', true).prop('required', false);
-            }
-        });
-
-        // Function to enable/disable fields based on the selected value of the Logistic Type dropdown
-        $('#logistic_type').change(function() {
-            var selectedValue = $(this).val();
-            if (selectedValue === 'own') {
-                // If Logistic Type is "Own", make Vehicle Number, Driver Name, and Amount fields required
-                $('#logistic_account, #logistic_driver, #logistic_amount').prop('disabled', false).prop(
-                    'required', true);
-            } else if (selectedValue === 'client') {
-                // If Logistic Type is "Client", disable Vehicle Number, Driver Name, and Amount fields
-                $('#logistic_account, #logistic_driver, #logistic_amount').prop('disabled', true).prop(
-                    'required', false);
-            }
-        });
         document.querySelector("input[type='number']").addEventListener("wheel", function(e) {
             e.preventDefault();
         });

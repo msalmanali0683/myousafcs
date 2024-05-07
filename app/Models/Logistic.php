@@ -13,6 +13,6 @@ class Logistic extends Model
 
     public function invoice_logistic(): HasMany
     {
-        return $this->hasMany(InvoiceLogistics::class);
+        return $this->hasMany(ProductTransaction::class);
     }
 }
