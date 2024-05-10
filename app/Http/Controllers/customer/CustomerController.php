@@ -84,14 +84,15 @@ class CustomerController extends Controller
                             ->where('category_id', $id);
                     });
             })
-            ->get();
+            ->latest()->get();
         foreach ($customerBalance as $transaction) {
-            if ($transaction->category == 'purchase_product' || $transaction->category == 'purchase_product') {
+            if ($transaction->category == 'purchase_product' || $transaction->category == 'sale_product') {
                 $product_details = Invoice::where('id', $transaction->account)->with('product_transactions', 'product_transactions.product')->first();
 
 
                 $transaction->product_details = $product_details;
             } else {
+
                 $transaction->product_details = [];
             }
         }
@@ -124,6 +125,7 @@ class CustomerController extends Controller
         $customer = Customer::findOrFail($id);
 
         // Pass the data to the view
+
         return view('customer.view', compact('customer', 'customerBalance', 'totalDebit', 'totalCredit'));
     }
 

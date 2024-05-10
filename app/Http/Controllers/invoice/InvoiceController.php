@@ -41,6 +41,7 @@ class InvoiceController extends Controller
     public function list()
     {
         $invoices = Invoice::with('customer', 'product_transactions.product')->latest()->get();
+        // dd($invoices);
         return view('Invoice.invoice-list', ['invoices' => $invoices]);
     }
 
@@ -146,7 +147,8 @@ class InvoiceController extends Controller
      */
     public function show(string $id)
     {
-        $invoice = Invoice::with('customer', 'product_transactions.product', 'adjustment')->where('id', $id)->first();
+        $invoice = Invoice::with('customer', 'product_transactions', 'adjustment')->where('id', $id)->first();
+
         return view('Invoice.invoice-print', ['invoice' => $invoice]);
     }
 

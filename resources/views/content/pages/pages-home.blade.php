@@ -101,7 +101,7 @@
                             <div class="mb-3 col-lg-4 col-xl-4 col-12 mb-0">
                                 <label class="form-label" for="account">Accounts</label>
                                 <select id="account" class="form-select">
-                                    <option id="selectHereOption">Select Bank name</option>
+
                                     @foreach ($banks as $bank)
                                         <option value="{{ $bank->id }}">{{ $bank->name }}, {{ $bank->account }},
                                             Balance: {{ $bank->balance }}

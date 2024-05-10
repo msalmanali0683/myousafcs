@@ -86,7 +86,7 @@
                         </thead>
                         <tbody id="balanceTableBody">
                             @php
-                                $balance = 0;
+                                $balance = $customer->balance;
                             @endphp
                             @foreach ($customerBalance as $item)
                                 <tr>
@@ -96,18 +96,21 @@
                                         <td><a href="{{ route('app-invoice-show', $item->account) }}"
                                                 data-bs-toggle="tooltip" class="text-body" data-bs-placement="top"
                                                 aria-label="Preview Invoice" data-bs-original-title="Preview Invoice">
-                                                @foreach ($item->product_details->product_transactions as $product_details)
-                                                    <p> <strong><small>
+                                                @if (isset($item->product_details) && is_object($item->product_details))
+                                                    @foreach ($item->product_details->product_transactions ?? [] as $product_details)
+                                                        <p>
+                                                            <strong><small>
+                                                                    {{ $product_details->product->name ?? 'N/A' }},
+                                                                    Bags:{{ $product_details->bags ?? 'N/A' }},
+                                                                    {{ $product_details->weight ?? 'N/A' }}Kg's,
+                                                                    Rate: {{ $product_details->rate ?? 'N/A' }}/mn
+                                                                </small></strong>
+                                                        </p>
+                                                    @endforeach
+                                                @else
+                                                    <p>No product details available.</p>
+                                                @endif
 
-                                                                Product: {{ $product_details->product->name }},
-                                                                Bags:{{ $product_details->bags }},
-                                                                Weight:{{ $product_details->weight }}Kg's,
-                                                                Rate: {{ $product_details->rate }}/mn
-                                                            </small>
-
-                                                        </strong>
-                                                    </p>
-                                                @endforeach
                                                 {{-- {{ $item->product_details }} --}}
                                             </a></td>
                                     @else
@@ -116,17 +119,19 @@
                                     @if ($item->type == 'debit')
                                         <td>{{ $item->amount }}</td>
                                         <td>0</td>
+                                        <td>{{ $balance }}</td>
                                         @php
-                                            $balance -= $item->amount;
+                                            $balance += $item->amount;
                                         @endphp
                                     @else
                                         <td>0</td>
                                         <td>{{ $item->amount }}</td>
+                                        <td>{{ $balance }}</td>
                                         @php
-                                            $balance += $item->amount;
+                                            $balance -= $item->amount;
                                         @endphp
                                     @endif
-                                    <td>{{ $balance }}</td>
+
                                 </tr>
                             @endforeach
                         </tbody>

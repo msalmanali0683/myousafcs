@@ -239,11 +239,11 @@
                                                             @endforeach
                                                         </select>
                                                     </div>
-                                                    <div class="col-lg-2 ">
+                                                    <div class="col-lg-2" style="display: none">
                                                         <label for="logistic_driver" class="form-label">Driver
                                                             Name</label>
                                                         <input class="form-control" placeholder="Enter  Driver name..."
-                                                            type="text" value="" tabindex="0"
+                                                            type="text" value="self" tabindex="0"
                                                             id="logistic_driver">
 
                                                     </div>

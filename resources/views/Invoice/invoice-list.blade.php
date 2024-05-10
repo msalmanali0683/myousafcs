@@ -124,16 +124,17 @@
                                 </div>
                             </td>
                             <td>
-                                @foreach ($invoice['product_transactions'] as $transaction)
-                                    <p> <strong><small>
-                                                {{-- {{ $transaction }} --}}
-                                                Product: {{ $transaction['product']['name'] }},
-                                                Bags:{{ $transaction->bags }},
-                                                Weight:{{ $transaction->weight }}Kg's,
-                                                Rate: {{ $transaction->rate }}/mn
-                                            </small>
+                                @foreach ($invoice->product_transactions as $transaction)
+                                    <p> <a href="{{ route('app-invoice-show', $invoice->id) }}"> <strong><small>
+                                                    {{-- {{ $transaction }} --}}
+                                                    {{ $transaction['product']['name'] }},
+                                                    Bags:{{ $transaction->bags }},
+                                                    {{ $transaction->weight }}Kg's,
+                                                    Rate: {{ $transaction->rate }}/mn
+                                                </small>
 
-                                        </strong>
+                                            </strong>
+                                        </a>
                                     </p>
 
                                     {{-- Break out of the loop after setting product name --}}
